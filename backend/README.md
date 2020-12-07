@@ -14,7 +14,7 @@ API port: 5000
 GET: localhost:5000/users
 
 ## Usefull links
-[Polish Overview of Routing Controllers](https://solutionchaser.com/piszemy-kontrolery-w-nodejs-latwiej-i-szybciej/)
+[Overview of Routing Controllers in Polish](https://solutionchaser.com/piszemy-kontrolery-w-nodejs-latwiej-i-szybciej/)
 
 [Routing Controllers Github Page](https://github.com/typestack/routing-controllers)
 
