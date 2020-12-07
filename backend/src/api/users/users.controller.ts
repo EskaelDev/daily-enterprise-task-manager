@@ -1,33 +1,36 @@
-import * as express from 'express';
+// import * as express from 'express';
+import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode } from "routing-controllers";
 import User from './users.interface'
 
+@JsonController("/users")
 export default class UsersController {
-    public path = '/users';
-    public router = express.Router();
-
     private users: User[] = [
         {
+            id: 1,
             login: 'usr01',
             password: 'halko'
+        },
+        {
+            id: 2,
+            login: 'usr02',
+            password: 'halko2'
         }
     ];
 
-    constructor() {
-        this.intializeRoutes();
+    @HttpCode(200)
+    @Get()
+    public async getAll() {
+        return this.users;
     }
 
-    public intializeRoutes() {
-        this.router.get(this.path, this.getAllUsers);
-        this.router.post(this.path, this.createUser);
+    @Get('/:userId')
+    public async getById(@Param('userId') userId: number) {
+        return this.users.find(u => u.id == userId);
     }
 
-    getAllUsers = (request: express.Request, response: express.Response) => {
-        response.send(this.users);
-    }
-
-    createUser = (request: express.Request, response: express.Response) => {
-        const user: User = request.body;
-        this.users.push(user);
-        response.send(user);
+    @Post()
+    public async AddUser(@Body({ required: true }) user: User) {
+        this.users.push(user)
+        return this.users;
     }
 }
