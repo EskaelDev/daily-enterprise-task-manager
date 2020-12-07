@@ -1,7 +1,6 @@
 <mat-toolbar color="primary" class="expanded-toolbar">
   <span>
-    <button mat-button routerLink="/">{{title}}</button>
-    <button mat-button routerLink="/"><mat-icon>home</mat-icon></button>
+    <button mat-button routerLink="/"><img src="favicon.ico" width="30" height="30" class="app-icon">{{title}}</button>
   </span>
 <div fxLayout="row" fxShow="false" fxShow.gt-sm>
   <button mat-button routerLink="/login" *ngIf="!isAuthenticated">

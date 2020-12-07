@@ -28,9 +28,9 @@ mat-form-field {
 
 // /* Style all font awesome icons */
 .fa {
-  padding: 20px;
-  font-size: 2em;
-  width: 30px;
+  padding: 10px;
+  font-size: 13px;
+  width: 15px;
   text-align: center;
   text-decoration: none;
   border-radius: 50%;
@@ -62,4 +62,8 @@ mat-form-field {
 .fa-github {
   background: #272626;
   color: white;
+}
+
+.sign-in {
+    margin-top: 8%;
 }
