@@ -17,3 +17,6 @@ GET: localhost:5000/users
 [Polish Overview of Routing Controllers](https://solutionchaser.com/piszemy-kontrolery-w-nodejs-latwiej-i-szybciej/)
 
 [Routing Controllers Github Page](https://github.com/typestack/routing-controllers)
+
+[AWS SDK](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/)
+[AWS SDK Getting Started](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/welcome.html)
