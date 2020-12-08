@@ -5,6 +5,7 @@ import { LoginComponent } from './login/login.component';
 import { AuthGuardService } from './services/auth-guard.service';
 import { TeamComponent } from './teams/team/team.component';
 import { TeamsComponent } from './teams/teams.component';
+import { UsersComponent } from './users/users.component';
 
 const routes: Routes = [
 {
@@ -34,7 +35,7 @@ const routes: Routes = [
     path: '',
     component: HomeComponent,
     data: {
-        breadcrumb: "Home"
+        breadcrumb: 'Home'
     },
     canActivate: [ AuthGuardService ]
 },
@@ -42,7 +43,7 @@ const routes: Routes = [
     path: 'teams',
     component: TeamsComponent,
     data: {
-        breadcrumb: "Teams"
+        breadcrumb: 'Teams'
     },
     canActivate: [ AuthGuardService ]
 },
@@ -60,6 +61,13 @@ const routes: Routes = [
         breadcrumb: null
     },
     component: LoginComponent
+},
+  {
+    path: 'users',
+    data: {
+      breadcrumb: null
+    },
+    component: UsersComponent
 }
 ];
 
