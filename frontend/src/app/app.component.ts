@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { IUser } from './models/iuser';
+import { User } from './models/user';
+import { Role } from './models/role.enum';
 import { AuthService } from './services/auth.service';
 
 @Component({
@@ -9,11 +10,16 @@ import { AuthService } from './services/auth.service';
 })
 export class AppComponent implements OnInit {
   title = 'Task Manager';
-  currentUser: IUser;
+  currentUser: User;
 
     constructor(public authService: AuthService) {
         this.authService.currentUser.subscribe(
-            (currentUser: IUser)  => this.currentUser = currentUser
+            (currentUser: User)  => {
+                this.currentUser = currentUser;
+
+                if (this.currentUser)
+                    this.currentUser.role = Role.Worker; // for test frontend
+            }
         );
     }
 
@@ -21,6 +27,10 @@ export class AppComponent implements OnInit {
         this.currentUser = await this.authService.currentUserValue;
     }
     
+    get isAdmin() {
+        return this.currentUser && this.currentUser.role === Role.Admin;
+    }
+
     logout() {
         this.authService.logout('/');
     }

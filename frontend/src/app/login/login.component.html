@@ -6,17 +6,26 @@
     </div>
     <div class="form-group">
       <label for="InputEmail">Email address</label>
-      <input type="email" class="form-control" id="InputEmail" aria-describedby="emailHelp" formControlName="email" required>
+      <input type="email" class="form-control" id="InputEmail" aria-describedby="emailHelp" formControlName="email"  [ngClass]="{ 'is-invalid': submitted && f.email.errors }">
+      <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+        <div *ngIf="f.email.errors.required">Username is required</div>
+      </div>
       <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
     </div>
     <div class="form-group">
       <label for="InputPassword">Password</label>
-      <input type="password" class="form-control" id="InputPassword" formControlName="password" required>
+      <input type="password" class="form-control" id="InputPassword" formControlName="password"  [ngClass]="{ 'is-invalid': submitted && f.password.errors }">
+      <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+        <div *ngIf="f.password.errors.required">Password is required</div>
+      </div>
     </div>
     <div class="form-group form-check">
       <input type="checkbox" class="form-check-input" id="Check">
       <label class="form-check-label" for="Check">Remember me</label>
     </div>
-    <button type="submit" class="btn btn-info btn-block btn-large">Let me in</button>
+    <button type="submit" class="btn btn-info btn-block btn-large">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+      Let me in
+    </button>
   </form>
 </div>

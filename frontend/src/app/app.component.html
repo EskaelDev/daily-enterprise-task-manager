@@ -10,7 +10,8 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav">
             <a href="/" class="nav-item nav-link active">Home</a>
-            <a href="/users" class="nav-item nav-link">Users</a>
+            <a href="/users" class="nav-item nav-link" *ngIf="isAdmin">Users</a>
+            <a href="/teams" class="nav-item nav-link">Teams</a>
         </div>
         <div class="navbar-nav ml-auto">
             <a href="" class="nav-item nav-link" (click)="logout()">Logout</a>
@@ -18,4 +19,7 @@
     </div>
 </nav>
 
+<div>
+<app-alert></app-alert>
 <router-outlet></router-outlet>
+</div>

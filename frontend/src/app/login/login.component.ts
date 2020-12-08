@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { first } from 'rxjs/operators';
+import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -11,16 +12,17 @@ import { first } from 'rxjs/operators';
 })
 export class LoginComponent implements OnInit {
 
-    form!: FormGroup;
-    public loginInvalid!: boolean;
-    private formSubmitAttempt!: boolean;
-    private returnUrl!: string;
+    form: FormGroup;
+    loading = false;
+    submitted = false;
+    private returnUrl: string;
 
     constructor(
         private fb: FormBuilder,
         private route: ActivatedRoute,
         private router: Router,
-        private authService: AuthService
+        private authService: AuthService,
+        private alertService: AlertService
     ) 
     {}
 
@@ -28,7 +30,7 @@ export class LoginComponent implements OnInit {
         this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/';
 
         this.form = this.fb.group({
-            email: ['', Validators.email],
+            email: ['', [Validators.email, Validators.required]],
             password: ['', Validators.required]
         });
         
@@ -37,24 +39,26 @@ export class LoginComponent implements OnInit {
         }
     }
 
+    get f() { return this.form.controls; }
+
     async onSubmit() {
-        this.loginInvalid = false;
-        this.formSubmitAttempt = false;
+        this.submitted = true;
+        // reset alerts on submit
+        this.alertService.clear();
+
         if (this.form.valid) {
-                const email = this.form.get('email')!.value;
-                const password = this.form.get('password')!.value;
-                await this.authService.login(email, password).pipe(first())
+            this.loading = true;
+            const email = this.form.get('email')!.value;
+            const password = this.form.get('password')!.value;
+            this.authService.login(email, password).pipe(first())
                 .subscribe(
                     data => {
                         this.router.navigate([this.returnUrl]);
                     },
                     error => {
-                        // this.alertService.error(error);
-                        // this.loading = false;
-                        this.loginInvalid = true;
+                        this.alertService.error("errrror");
+                        this.loading = false;
                     });
-        } else {
-            this.formSubmitAttempt = true;
         }
     }
 }
