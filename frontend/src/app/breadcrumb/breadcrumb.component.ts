@@ -31,7 +31,8 @@ export class BreadcrumbComponent implements OnInit {
    * @param breadcrumbs
    */
     buildBreadCrumb(route: ActivatedRoute, url: string = '', breadcrumbs: IBreadCrumb[] = []): IBreadCrumb[] {
-        //If no routeConfig is avalailable we are on the root path
+        let routes: Array<string>;
+
         let label = route.routeConfig && route.routeConfig.data ? route.routeConfig.data.breadcrumb : '';
         let path = route.routeConfig && route.routeConfig.data ? route.routeConfig.path : '';
 

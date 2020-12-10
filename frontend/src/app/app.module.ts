@@ -8,8 +8,9 @@ import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AlertComponent } from './components/alert/alert.component';
-import { TeamComponent } from './team/team.component';
+import { TeamComponent } from './teams/team/team.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
+import { TeamsComponent } from './teams/teams.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
     HomeComponent,
     AlertComponent,
     TeamComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    TeamsComponent
   ],
   imports: [
     BrowserModule,

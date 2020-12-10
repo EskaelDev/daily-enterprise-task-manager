@@ -3,32 +3,55 @@ import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { AuthGuardService } from './services/auth-guard.service';
-import { TeamComponent } from './team/team.component';
+import { TeamComponent } from './teams/team/team.component';
+import { TeamsComponent } from './teams/teams.component';
 
 const routes: Routes = [
 {
+    // path: '',
+    // data: {
+    //     breadcrumb: 'Home'
+    // },
+    // children: [
+    //     {
+    //         path: 'team',
+    //         data: {
+    //             breadcrumb: 'Team'
+    //         },
+    //         children: [
+    //             {
+    //                 path: '',
+    //                 data: {
+    //                     breadcrumb: null
+    //                 },
+    //                 component: TeamComponent
+    //             }
+    //         ]
+    //     }
+    // ],
+    // component: HomeComponent,
+    // canActivate: [ AuthGuardService ]
     path: '',
-    data: {
-        breadcrumb: 'Home'
-    },
-    children: [
-        {
-            path: 'team',
-            data: {
-                breadcrumb: 'Team'
-            },
-            children: [
-                {
-                    path: '',
-                    data: {
-                        breadcrumb: null
-                    },
-                    component: TeamComponent
-                }
-            ]
-        }
-    ],
     component: HomeComponent,
+    data: {
+        breadcrumb: "Home"
+    },
+    canActivate: [ AuthGuardService ]
+},
+{
+    path: 'teams',
+    component: TeamsComponent,
+    data: {
+        breadcrumb: "Teams"
+    },
+    canActivate: [ AuthGuardService ]
+},
+{
+    path: 'teams/team/:teamId',
+    component: TeamComponent,
+    data: {
+        breadcrumb: null
+    },
     canActivate: [ AuthGuardService ]
 },
 {

@@ -1,0 +1,43 @@
+<h3 class="ml-3">{{ team.name }}</h3>
+<div class="overflow-auto container">
+<div class="container columns">
+    <div class="card mr-4 mb-4 column-card" style="width: 18rem;" *ngFor="let user of team.members">
+        <div class="card-body">
+          <h5 class="card-title"> {{ user.login }} </h5>
+          <span class="card-title"> {{ tasks.length }} Cards</span>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item list-of-tasks">
+            <div class="card mb-2 task-card" style="width: 16rem;" *ngFor="let task of tasks">
+                <span class="card-title m-2">{{ task.title }}</span>
+                <div class="container tags-columns">
+                    <span class="badge badge-pill badge-info m-1 mb-2" *ngFor="let tag of task.tags">{{ tag }}</span>
+                </div>
+            </div>
+          </li>
+        </ul>
+        <div class="card-body">
+          <a href="javascript:;" (onClick)="addTask()" class="card-link">Add card</a>
+        </div>
+    </div>
+    <div class="card mr-4 mb-4 column-card" style="width: 18rem;" *ngFor="let user of team.members">
+        <div class="card-body">
+          <h5 class="card-title"> {{ user.login }} </h5>
+          <span class="card-title"> {{ tasks.length }} Cards</span>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item list-of-tasks">
+            <div class="card mb-2 task-card" style="width: 16rem;" *ngFor="let task of tasks">
+                <span class="card-title m-2">{{ task.title }}</span>
+                <div class="container tags-columns">
+                    <span class="badge badge-pill badge-info m-1 mb-2" *ngFor="let tag of task.tags">{{ tag }}</span>
+                </div>
+            </div>
+          </li>
+        </ul>
+        <div class="card-body">
+          <a href="javascript:;" (onClick)="addTask()" class="card-link">Add card</a>
+        </div>
+    </div>
+</div>
+</div>

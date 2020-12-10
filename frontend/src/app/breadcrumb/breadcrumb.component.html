@@ -1,5 +1,5 @@
 <nav>
-    <ol class="breadcrumb">
+    <ol class="breadcrumb mb-0">
         <li class="breadcrumb-item" *ngFor="let breadcrumb of breadcrumbs; last as isLast; first as isFirst">
             <a href="javascript:;" *ngIf="!isLast" [routerLink]="breadcrumb.url" routerLinkActive="router-link-active">
                 {{ breadcrumb.label }}
