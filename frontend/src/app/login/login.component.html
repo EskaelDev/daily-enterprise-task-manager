@@ -1,8 +1,8 @@
 <div class="login">
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="container login-title mb-4">
-        <img src="../../favicon.ico" width="100" height="110" class="mr-4"/>
-        <h1>Login</h1>
+        <img src="../../favicon.ico" width="90" height="100" class="mr-3"/>
+        <h2>Login</h2>
     </div>
     <div class="form-group">
       <label for="InputEmail">Email address</label>
@@ -10,7 +10,7 @@
       <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
         <div *ngIf="f.email.errors.required">Username is required</div>
       </div>
-      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+      <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
     </div>
     <div class="form-group">
       <label for="InputPassword">Password</label>
@@ -19,10 +19,10 @@
         <div *ngIf="f.password.errors.required">Password is required</div>
       </div>
     </div>
-    <div class="form-group form-check">
+    <!-- <div class="form-group form-check">
       <input type="checkbox" class="form-check-input" id="Check">
       <label class="form-check-label" for="Check">Remember me</label>
-    </div>
+    </div> -->
     <button type="submit" class="btn btn-info btn-block btn-large">
       <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
       Let me in

@@ -8,13 +8,17 @@ import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { AlertComponent } from './components/alert/alert.component';
+import { TeamComponent } from './team/team.component';
+import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     HomeComponent,
-    AlertComponent
+    AlertComponent,
+    TeamComponent,
+    BreadcrumbComponent
   ],
   imports: [
     BrowserModule,

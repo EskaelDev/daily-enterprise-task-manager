@@ -3,17 +3,41 @@ import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { AuthGuardService } from './services/auth-guard.service';
+import { TeamComponent } from './team/team.component';
 
 const routes: Routes = [
-  {
+{
     path: '',
+    data: {
+        breadcrumb: 'Home'
+    },
+    children: [
+        {
+            path: 'team',
+            data: {
+                breadcrumb: 'Team'
+            },
+            children: [
+                {
+                    path: '',
+                    data: {
+                        breadcrumb: null
+                    },
+                    component: TeamComponent
+                }
+            ]
+        }
+    ],
     component: HomeComponent,
     canActivate: [ AuthGuardService ]
-  },
-  {
+},
+{
     path: 'login',
+    data: {
+        breadcrumb: null
+    },
     component: LoginComponent
-  }
+}
 ];
 
 @NgModule({
