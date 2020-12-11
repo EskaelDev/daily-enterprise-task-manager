@@ -19,6 +19,8 @@
     </div>
 </nav>
 
+<app-breadcrumb *ngIf="currentUser"></app-breadcrumb>
+
 <div>
 <app-alert></app-alert>
 <router-outlet></router-outlet>

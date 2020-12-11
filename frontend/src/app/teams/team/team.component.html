@@ -1,0 +1,50 @@
+<div class="search">
+  <div>
+  <h5 class="ml-3">{{ team.name }}</h5>
+  </div>
+  <div class="mr-3 pb-1">
+  <input class="form-control form-control-sm" id="searchInput" type="text" placeholder="Search..">
+</div>
+</div>
+<div class="overflow-auto">
+<div class="d-flex flex-row columns">
+    <div class="card column-card ml-1 mr-1" style="width: 18rem;" *ngFor="let user of team.members">
+        <div class="card-body pl-3 pt-2">
+          <h5> {{ user.login }} </h5>
+          <span> {{ tasks.length }} Cards</span>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item list-of-tasks">
+            <div class="card mb-2 task-card" *ngFor="let task of tasks">
+                <span class="card-title m-2">{{ task.title }}</span>
+                <div class="container tags-columns">
+                    <span class="badge badge-pill badge-info m-1" *ngFor="let tag of task.tags">{{ tag }}</span>
+                </div>
+            </div>
+          </li>
+        </ul>
+        <div class="m-1 ml-3">  
+        <a href="javascript:;" style="font-size: small;" (onClick)="addTask()">Add card</a>
+      </div>
+    </div>
+    <div class="card column-card ml-1 mr-1" style="width: 18rem;" *ngFor="let user of team.members">
+      <div class="card-body pl-3 pt-2">
+        <h5> {{ user.login }} </h5>
+        <span> {{ tasks.length }} Cards</span>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item list-of-tasks">
+          <div class="card mb-2 task-card" *ngFor="let task of tasks">
+              <span class="card-title m-2">{{ task.title }}</span>
+              <div class="container tags-columns">
+                  <span class="badge badge-pill badge-info m-1" *ngFor="let tag of task.tags">{{ tag }}</span>
+              </div>
+          </div>
+        </li>
+      </ul>
+      <div class="m-1 ml-3">  
+      <a href="javascript:;" style="font-size: small;" (onClick)="addTask()">Add card</a>
+    </div>
+  </div>
+</div>
+</div>

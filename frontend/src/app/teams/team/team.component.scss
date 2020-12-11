@@ -1,0 +1,41 @@
+.columns {
+    height: 73vh;
+}
+
+.tags-columns {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.task-card{
+    background: rgb(56 61 63 / 47%);
+}
+
+.column-card{
+    background: rgb(24 32 34 / 66%);
+    display: flex;
+    flex-shrink: 0;
+    align-self: flex-start;
+}
+
+.list-of-tasks{
+    background: rgba(56 61 63 / 0%);
+}
+
+a {
+	color: rgb(50,77,170) !important;
+}
+
+.all {
+    width: 100%;
+}
+
+.card-body{
+    padding: 0;
+}
+
+.search {
+    display: flex;
+    justify-content: space-between;
+}

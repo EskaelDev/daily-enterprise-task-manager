@@ -6,4 +6,8 @@ export class User implements IUser {
     login: string;
     password: string;
     role?: Role = Role.Worker;
+
+    constructor(init?:Partial<User>) {
+        Object.assign(this, init);
+    }
 }
