@@ -17,7 +17,6 @@ export default class UsersController {
         }
     ];
 
-    @HttpCode(200)
     @Get()
     public async getAll() {
         return this.users;

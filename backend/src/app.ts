@@ -1,7 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import * as bodyParser from 'body-parser';
 import "reflect-metadata";
-import { useExpressServer } from "routing-controllers";
+import { useExpressServer, createExpressServer } from "routing-controllers";
 import cors from 'cors';
 
 export default class App {
@@ -10,15 +10,19 @@ export default class App {
 
     constructor(port: number) {
 
-        this.app = express();
+        this.app = createExpressServer({
+            cors:true,
+            routePrefix: '/api',
+            controllers: [__dirname + "/**/*.controller.ts"]
+        });
         this.port = port;
 
-        this.initializeMiddlewares();
-        this.initializeControllers();
+        // this.initializeMiddlewares();
+        // this.initializeControllers();
     }
 
     private initializeMiddlewares() {
-        this.app.use(bodyParser.json(), cors());
+        this.app.use(cors());
     }
 
     private initializeControllers() {
