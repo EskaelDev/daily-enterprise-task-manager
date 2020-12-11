@@ -16,31 +16,76 @@ export default class TestController {
 
 
 
-@Get('/put')
-public async put(){
-    return await new Promise((result) => {
-        let request = this.dynamoTest.upload();
-        request
-            .on('complete', res => {
-                result(res.httpResponse)
-                // result('ok')
-                console.log('_________complete');
-            })
-            .on('error', res => {
-                // result('ok')
-                result(res.message);
-                console.log('__________error');
-            })
-            .on('success', res => {
-                // result('ok')
-                result(res.httpResponse);
-                console.log('__________success');
-            });
+    @Get('/get')
+    public async getItem() {
+        return await new Promise((result) => {
+            let request = this.dynamoTest.get();
 
-    });
-}
+            request
+                .on('complete', res => {
+                    console.log('_________complete');
+                })
+                .on('error', res => {
+                    result(res.message)
+                    console.log('__________error');
+                })
+                .on('success', res => {
+                    result(res.data);
+                    console.log( res.data);
+                    
+                    console.log('__________success');
+                });
+
+        });
+    }
 
 
+    @Get('/put')
+    public async put() {
+        return await new Promise((result) => {
+            let request = this.dynamoTest.upload();
+
+            request
+                .on('complete', res => {
+                    result('status: ' + res.httpResponse.statusCode)
+                    console.log('_________complete');
+                })
+                .on('error', res => {
+                    result(res.message)
+                    console.log('__________error');
+                })
+                .on('success', res => {
+                    result('status: ' + res.httpResponse.statusCode)
+                    console.log('__________success');
+                });
+
+        });
+    }
+
+
+    
+    @Get('/update')
+    public async update() {
+        return await new Promise((result) => {
+            let request = this.dynamoTest.update();
+
+            request
+                .on('complete', res => {
+                    console.log('_________complete');
+                })
+                .on('error', res => {
+                    result(res.message)
+                    console.log('__________error');
+                })
+                .on('success', res => {
+                    result(res.data);
+                    console.log( res.data);
+                    
+                    console.log('__________success');
+                });
+
+        });
+    }
 
     @Get()
     public async getAll() {
@@ -50,15 +95,15 @@ public async put(){
 
             request
                 .on('complete', res => {
-                    result(res)
+                    result(res.data)
                     console.log('_________complete');
                 })
                 .on('error', res => {
-                    result(res);
+                    result(res.message)
                     console.log('__________error');
                 })
                 .on('success', res => {
-                    result(res);
+                    result(res.data)
                     console.log('__________success');
                 });
 

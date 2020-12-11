@@ -49,23 +49,60 @@ export default class DynamoTest {
     public createTable(): AWS.Request<DynamoDB.CreateTableOutput, AWS.AWSError> {
         return this.dynamodb.createTable(this.params, function (err, data) {
             if (err) {
-                console.error("Unable to create table. Error JSON:", JSON.stringify(err, null, 2));
+                return err
             } else {
-                console.log("Created table. Table description JSON:", JSON.stringify(data, null, 2));
+                return data;
             }
-            return data;
         });
     }
 
+    public get() {
+        let params = {
+            TableName: "Movies",
+            Key: {
+                "year": 2013,
+                "title": "Turn It Down, Or Else!",
+            }
+        };
+
+        return this.docClient.get(params, function (err, data) {
+            if (err) {
+                console.error("Unable to read item. Error JSON:", JSON.stringify(err, null, 2));
+            } else {
+                console.log("GetItem succeeded:", JSON.stringify(data, null, 2));
+            }
+        });
+
+    }
 
     public upload() {
 
         var params = {
             TableName: "Movies",
             Item: {
-                "year": 1999,
-                "title": 'movie.title',
-                "info": 'movie.info'
+                "year": 2013,
+                "title": "Turn It Down, Or Else!",
+                "info": {
+                    "directors": [
+                        "Alice Smith",
+                        "Bob Jones"
+                    ],
+                    "release_date": "2013-01-18T00:00:00Z",
+                    "rating": 6.2,
+                    "genres": [
+                        "Comedy",
+                        "Drama"
+                    ],
+                    "image_url": "http://ia.media-imdb.com/images/N/O9ERWAU7FS797AJ7LU8HN09AMUP908RLlo5JF90EWR7LJKQ7@@._V1_SX400_.jpg",
+                    "plot": "A rock band plays their music at high volumes, annoying the neighbors.",
+                    "rank": 11,
+                    "running_time_secs": 5215,
+                    "actors": [
+                        "David Matthewman",
+                        "Ann Thomas",
+                        "Jonathan G. Neff"
+                    ]
+                }
             }
         };
 
@@ -79,31 +116,30 @@ export default class DynamoTest {
     }
 
 
+    public update() {
 
-    public LoadData() {
+        var params = {
+            TableName: "Movies",
+            Key: {
+                "year": 2013,
+                "title": "Turn It Down, Or Else!",
+            },
+            UpdateExpression: "set info.rating = :r, info.plot=:p, info.actors=:a",
+            ExpressionAttributeValues: {
+                ":r": 5.5,
+                ":p": "Everything happens all at once.",
+                ":a": ["Larry", "Moe", "Curly"]
+            },
+            ReturnValues: "UPDATED_NEW"
+        };
 
-        var docClient = new AWS.DynamoDB.DocumentClient();
-
-        console.log("Importing movies into DynamoDB. Please wait.");
-
-        var allMovies = JSON.parse(fs.readFileSync('../../moviedata.json', 'utf8'));
-        allMovies.forEach(function (movie: any) {
-            var params = {
-                TableName: "Movies",
-                Item: {
-                    "year": movie.year,
-                    "title": movie.title,
-                    "info": movie.info
-                }
-            };
-
-            docClient.put(params, function (err, data) {
-                if (err) {
-                    console.error("Unable to add movie", movie.title, ". Error JSON:", JSON.stringify(err, null, 2));
-                } else {
-                    console.log("PutItem succeeded:", movie.title);
-                }
-            });
+        console.log("Updating the item...");
+        return this.docClient.update(params, function (err, data) {
+            if (err) {
+                console.error("Unable to update item. Error JSON:", JSON.stringify(err, null, 2));
+            } else {
+                console.log("UpdateItem succeeded:", JSON.stringify(data, null, 2));
+            }
         });
     }
 }

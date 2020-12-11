@@ -21,3 +21,5 @@ GET: localhost:5000/users
 [AWS SDK](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/)
 
 [AWS SDK Getting Started](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/welcome.html)
+
+[DynamoDB CRUD](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.NodeJs.03.html)
