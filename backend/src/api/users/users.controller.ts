@@ -1,17 +1,15 @@
 // import * as express from 'express';
 import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode } from "routing-controllers";
-import User from './users.interface'
+import User from './user.interface'
 
 @JsonController("/users")
 export default class UsersController {
     private users: User[] = [
         {
-            id: 1,
             login: 'usr01',
             password: 'halko'
         },
         {
-            id: 2,
             login: 'usr02',
             password: 'halko2'
         }
@@ -22,9 +20,9 @@ export default class UsersController {
         return this.users;
     }
 
-    @Get('/:userId')
-    public async getById(@Param('userId') userId: number) {
-        return this.users.find(u => u.id == userId);
+    @Get('/:userLogin')
+    public async getById(@Param('userLogin') userLogin: string) {
+        return this.users.find(u => u.login == userLogin);
     }
 
     @Post()
