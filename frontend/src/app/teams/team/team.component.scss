@@ -39,3 +39,8 @@ a {
     display: flex;
     justify-content: space-between;
 }
+
+.tasks-list{
+    overflow-y: auto;
+    max-height: 55vh;
+}

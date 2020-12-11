@@ -20,15 +20,23 @@ export class TeamComponent implements OnInit {
   ngOnInit(): void {
     const manager = this.authService.currentUserValue;
     
-    this.team = {id: 1, name: "team1", manager: manager, members: [new User({login: "nanan@bla.com"}),new User({login: "blablabla@bla.com"}),new User({login: "haluu@bla.com"}),
-    new User({login: "kasia@bla.com"})]};
+    this.team = {id: 1, name: "team1", manager: manager, members: [new User({id: 1, login: "nanan@bla.com"}),new User({id:2,login: "blablabla@bla.com"}),new User({id:3, login: "haluu@bla.com"}),
+    new User({id:4,login: "kasia@bla.com"})]};
     this.tasks = [
       {title: "title1", description: "", user: this.team.members[0], tags: ["tag1", "ta2", "tag5"]},
+      {title: "title2", description: "", user: this.team.members[0], tags: ["tag1"]},
+      {title: "title2", description: "", user: this.team.members[0], tags: ["tag1"]},
+      {title: "title2", description: "", user: this.team.members[0], tags: ["tag1"]},
       {title: "title2", description: "", user: this.team.members[0], tags: ["tag1"]}];
   }
 
   addTask()
   {
       this.tasks.push({title: "added task", description: "", user: this.team.members[0], tags: []});
+  }
+
+  getTasksByMembers(userId: number)
+  {
+      return this.tasks.filter(task => task.user.id == userId);
   }
 }
