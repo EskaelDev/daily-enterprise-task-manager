@@ -1,9 +1,5 @@
 .columns {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
+    height: 73vh;
 }
 
 .tags-columns {
@@ -18,6 +14,9 @@
 
 .column-card{
     background: rgb(24 32 34 / 66%);
+    display: flex;
+    flex-shrink: 0;
+    align-self: flex-start;
 }
 
 .list-of-tasks{
@@ -30,4 +29,13 @@ a {
 
 .all {
     width: 100%;
+}
+
+.card-body{
+    padding: 0;
+}
+
+.search {
+    display: flex;
+    justify-content: space-between;
 }
