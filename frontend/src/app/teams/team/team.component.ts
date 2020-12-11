@@ -37,6 +37,5 @@ export class TeamComponent implements OnInit {
   getTasksByMembers(userId: number)
   {
       return this.tasksService.getTasksOf(userId);
-      //filter(task => task.userId == userId);
   }
 }

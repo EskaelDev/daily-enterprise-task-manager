@@ -7,44 +7,44 @@
 </div>
 </div>
 <div class="overflow-auto">
-<div class="d-flex flex-row columns">
-    <div class="card column-card ml-1 mr-1" style="width: 18rem;" *ngFor="let user of team.members">
-        <div class="card-body pl-3 pt-2">
-            <h5> {{ user.login }} </h5>
-            <span> {{ getTasksByMembers(user.id).length }} Cards</span>
-        </div>
-        <ul class="list-group list-group-flush tasks-list">
-            <li class="list-group-item list-of-tasks">
-                <div class="card mb-2 task-card" *ngFor="let task of getTasksByMembers(user.id)">
-                    <span class="card-title m-2">{{ task.title }}</span>
-                    <div class="container tags-columns">
-                        <span class="badge badge-pill badge-info m-1" *ngFor="let tag of task.tags">{{ tag }}</span>
+    <div class="d-flex flex-row columns">
+        <div class="card column-card ml-1 mr-1" style="width: 18rem;">
+            <div class="card-body pl-3 pt-2">
+                <h5> Unassigned tasks </h5>
+                <span> {{ getTasksByMembers(-1).length }} Cards</span>
+            </div>
+            <ul class="list-group list-group-flush tasks-list">
+                <li class="list-group-item list-of-tasks">
+                    <div class="card mb-2 task-card" *ngFor="let task of getTasksByMembers(-1)">
+                        <span class="card-title m-2">{{ task.title }}</span>
+                        <div class="container tags-columns">
+                            <span class="badge badge-pill badge-info m-1" *ngFor="let tag of task.tags">{{ tag }}</span>
+                        </div>
                     </div>
-                </div>
-            </li>
-        </ul>
-        <div class="m-1 ml-3">  
-        <a style="font-size: small;" (click)="addTask(user.id)" href="javascript:void(0)">Add card</a>
-      </div>
-    </div>
-    <div class="card column-card ml-1 mr-1" style="width: 18rem;" *ngFor="let user of team.members">
-        <div class="card-body pl-3 pt-2">
-            <h5> {{ user.login }} </h5>
-            <span> {{ getTasksByMembers(user.id).length }} Cards</span>
+                </li>
+            </ul>
+            <div class="m-1 ml-3">  
+                <a style="font-size: small;" (click)="addTask(-1)" href="javascript:void(0)">Add card</a>
+            </div>
         </div>
-        <ul class="list-group list-group-flush tasks-list">
-            <li class="list-group-item list-of-tasks">
-                <div class="card mb-2 task-card" *ngFor="let task of getTasksByMembers(user.id)">
-                    <span class="card-title m-2">{{ task.title }}</span>
-                    <div class="container tags-columns">
-                        <span class="badge badge-pill badge-info m-1" *ngFor="let tag of task.tags">{{ tag }}</span>
+        <div class="card column-card ml-1 mr-1" style="width: 18rem;" *ngFor="let user of team.members">
+            <div class="card-body pl-3 pt-2">
+                <h5> {{ user.login }} </h5>
+                <span> {{ getTasksByMembers(user.id).length }} Cards</span>
+            </div>
+            <ul class="list-group list-group-flush tasks-list">
+                <li class="list-group-item list-of-tasks">
+                    <div class="card mb-2 task-card" *ngFor="let task of getTasksByMembers(user.id)">
+                        <span class="card-title m-2">{{ task.title }}</span>
+                        <div class="container tags-columns">
+                            <span class="badge badge-pill badge-info m-1" *ngFor="let tag of task.tags">{{ tag }}</span>
+                        </div>
                     </div>
-                </div>
-            </li>
-        </ul>
-        <div class="m-1 ml-3">  
-        <a href="javascript:;" style="font-size: small;" (onClick)="addTask(user.id)">Add card</a>
-      </div>
+                </li>
+            </ul>
+            <div class="m-1 ml-3">  
+                <a style="font-size: small;" (click)="addTask(user.id)" href="javascript:void(0)">Add card</a>
+            </div>
+        </div>
     </div>
-</div>
 </div>
