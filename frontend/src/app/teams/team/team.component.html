@@ -24,7 +24,7 @@
             </li>
         </ul>
         <div class="m-1 ml-3">  
-        <a href="javascript:;" style="font-size: small;" (onClick)="addTask()">Add card</a>
+        <a style="font-size: small;" (click)="addTask(user.id)" href="javascript:void(0)">Add card</a>
       </div>
     </div>
     <div class="card column-card ml-1 mr-1" style="width: 18rem;" *ngFor="let user of team.members">
@@ -43,7 +43,7 @@
             </li>
         </ul>
         <div class="m-1 ml-3">  
-        <a href="javascript:;" style="font-size: small;" (onClick)="addTask()">Add card</a>
+        <a href="javascript:;" style="font-size: small;" (onClick)="addTask(user.id)">Add card</a>
       </div>
     </div>
 </div>

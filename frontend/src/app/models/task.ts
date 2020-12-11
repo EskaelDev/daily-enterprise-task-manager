@@ -1,8 +1,11 @@
-import { User } from './user';
-
 export class Task {
+    id: number = -1;
     title: string;
     description: string;
     tags: string[];
-    user: User
+    userId: number;
+
+    constructor(init?:Partial<Task>) {
+        Object.assign(this, init);
+    }
 }
