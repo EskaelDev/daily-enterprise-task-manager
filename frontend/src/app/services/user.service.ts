@@ -1,20 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable, Subscriber } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { IUser } from '../models/iuser';
+import { Role } from '../models/role.enum';
+import { User } from '../models/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  user: IUser = new User({login: "druciak", role: Role.Manager, name: "Aleksandra", surname: "Druciak", language: "EN"});
   constructor(private http: HttpClient) { }
 
   getAll() {
       return this.http.get<IUser[]>(`${environment.apiUrl}/users`);
   }
 
-  getUser(id: number = 1) {
-    return this.http.get<IUser>(`${environment.apiUrl}/users/${id}`);
+  getUser(login: string) {
+    //  return this.http.get<IUser>(`${environment.apiUrl}/users/${login}`);
+    return this.user;
   }
 
   register(user: IUser) {

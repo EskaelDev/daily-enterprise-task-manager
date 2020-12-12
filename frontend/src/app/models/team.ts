@@ -1,8 +1,12 @@
-import { User } from './user';
+import { User } from "./user";
 
 export class Team {
-    id: number;
     name: string;
+    department: string;
     manager: User;
     members: User[];
+
+    constructor(init?:Partial<Team>) {
+        Object.assign(this, init);
+    }
 }

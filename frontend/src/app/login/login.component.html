@@ -5,16 +5,16 @@
         <h2>Login</h2>
     </div>
     <div class="form-group">
-      <label for="InputEmail">Email address</label>
-      <input type="email" class="form-control form-control-sm" id="InputEmail" aria-describedby="emailHelp" formControlName="email"  [ngClass]="{ 'is-invalid': submitted && f.email.errors }">
-      <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
-        <div *ngIf="f.email.errors.required">Username is required</div>
+      <label for="InputEmail">Username</label>
+      <input type="text" class="form-control form-control-sm dark-input dark-border" id="InputLogin" aria-describedby="loginHelp" formControlName="login"  [ngClass]="{ 'is-invalid': submitted && f.login.errors }">
+      <div *ngIf="submitted && f.login.errors" class="invalid-feedback">
+        <div *ngIf="f.login.errors.required">Username is required</div>
       </div>
       <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
     </div>
     <div class="form-group">
       <label for="InputPassword">Password</label>
-      <input type="password" class="form-control form-control-sm" id="InputPassword" formControlName="password"  [ngClass]="{ 'is-invalid': submitted && f.password.errors }">
+      <input type="password" class="form-control form-control-sm dark-input dark-border" id="InputPassword" formControlName="password"  [ngClass]="{ 'is-invalid': submitted && f.password.errors }">
       <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
         <div *ngIf="f.password.errors.required">Password is required</div>
       </div>

@@ -11,6 +11,7 @@ import { AlertComponent } from './components/alert/alert.component';
 import { TeamComponent } from './teams/team/team.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { TeamsComponent } from './teams/teams.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { TeamsComponent } from './teams/teams.component';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    FontAwesomeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

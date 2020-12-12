@@ -17,9 +17,9 @@ export class TeamsComponent implements OnInit {
     const manager = this.authService.currentUserValue;
 
     this.teams = [
-      {id: 1, name: "team1", manager: manager, members: [new User({login: "nanan@bla.com"}),new User({login: "blablabla@bla.com"}),
+      {name: "team1", department: "department1", manager: manager, members: [new User({login: "nanan@bla.com"}),new User({login: "blablabla@bla.com"}),
       new User({login: "haluu@bla.com"}), new User({login: "kasia@bla.com"})]},
-      {id: 7, name: "team2", manager: manager, members: [new User({login: "dobranoc@bla.com"})]}
+      {name: "team2", department: "department2", manager: manager, members: [new User({login: "dobranoc@bla.com"})]}
     ];
   }
 
