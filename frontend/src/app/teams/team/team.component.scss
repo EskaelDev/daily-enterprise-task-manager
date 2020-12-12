@@ -24,7 +24,7 @@
 }
 
 a {
-	color: rgb(50,77,170) !important;
+	color: rgb(81, 105, 187);
 }
 
 .all {
@@ -43,4 +43,9 @@ a {
 .tasks-list{
     overflow-y: auto;
     max-height: 55vh;
+}
+
+.actions{
+    display: flex;
+    justify-content: space-between;
 }

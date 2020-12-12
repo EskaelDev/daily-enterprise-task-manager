@@ -21,7 +21,8 @@ export class TasksService {
     // }, error => console.log('Could not load tasks.'));
     const tasks: Task[] = [
       new Task({id:1, title: "title1", description: "", userLogin: "druciak", tags: ["tag1", "ta2", "tag5"]}),
-      new Task({id:2, title: "title2", description: "", userLogin: "druciak", tags: ["tag1"]})];
+      new Task({id:2, title: "title2", description: "", userLogin: "druciak", tags: ["tag1"]}),
+      new Task({id:3, title: "title2", description: "", tags: ["tag1"]})];
     this.dataStore.tasks = tasks;
     this._tasks.next(Object.assign({}, this.dataStore).tasks);
   }
@@ -76,12 +77,17 @@ export class TasksService {
   }
 
   remove(taskId: number) {
-    this.http.delete(`${environment.apiUrl}/tasks/${taskId}`).subscribe(response => {
-      this.dataStore.tasks.forEach((t, i) => {
-        if (t.id === taskId) { this.dataStore.tasks.splice(i, 1); }
-      });
+    // this.http.delete(`${environment.apiUrl}/tasks/${taskId}`).subscribe(response => {
+    //   this.dataStore.tasks.forEach((t, i) => {
+    //     if (t.id === taskId) { this.dataStore.tasks.splice(i, 1); }
+    //   });
 
-      this._tasks.next(Object.assign({}, this.dataStore).tasks);
-    }, error => console.log('Could not delete task.'));
+    //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
+    // }, error => console.log('Could not delete task.'));
+    this.dataStore.tasks.forEach((t, i) => {
+          if (t.id === taskId) { this.dataStore.tasks.splice(i, 1); }
+        });
+  
+        this._tasks.next(Object.assign({}, this.dataStore).tasks);
   }
 }

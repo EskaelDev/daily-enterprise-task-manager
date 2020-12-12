@@ -5,6 +5,7 @@ import { Team } from 'src/app/models/team';
 import { User } from 'src/app/models/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { TasksService } from 'src/app/services/tasks.service';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-team',
@@ -16,6 +17,10 @@ export class TeamComponent implements OnInit {
   @Input()
   team: Team;
   tasks: Observable<Task[]>;
+  mdlSampleIsOpen: boolean = false;
+
+  // icons
+  faTrash = faTrash;
 
   constructor(private authService: AuthService, private tasksService: TasksService) { }
 
@@ -37,5 +42,16 @@ export class TeamComponent implements OnInit {
   getTasksByMembers(userLogin?: string)
   {
       return this.tasksService.getTasksOf(userLogin);
+  }
+
+  onTrashClicked(taskId: number)
+  {
+    this.tasksService.remove(taskId);
+  }
+
+  onTaskClicked(taskId: number)
+  {
+    this.mdlSampleIsOpen = true;
+    console.log(`Update of ${taskId}`)
   }
 }

@@ -1,6 +1,6 @@
 <ul class="list-group m-3">
-    <a class="list-group-item list-group-item-action mt-1" *ngFor="let team of teams" [routerLink]="['/teams/team', team.name]">
-        {{ team.name }}
+    <a class="list-group-item list-group-item-action mt-1 dark-input" *ngFor="let team of teams" [routerLink]="['/teams/team', team.name]">
+        <span>{{ team.name }}</span>
     </a>
 </ul>
 <p *ngIf="!teams || teams.length === 0">No teams found</p>
