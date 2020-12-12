@@ -11,11 +11,11 @@
         <div class="card column-card ml-1 mr-1" style="width: 18rem;">
             <div class="card-body pl-3 pt-2">
                 <h5> Unassigned tasks </h5>
-                <span> {{ getTasksByMembers(-1).length }} Cards</span>
+                <span> {{ getTasksByMembers(null).length }} Cards</span>
             </div>
             <ul class="list-group list-group-flush tasks-list">
                 <li class="list-group-item list-of-tasks">
-                    <div class="card mb-2 task-card" *ngFor="let task of getTasksByMembers(-1)">
+                    <div class="card mb-2 task-card" *ngFor="let task of getTasksByMembers(null)">
                         <span class="card-title m-2">{{ task.title }}</span>
                         <div class="container tags-columns">
                             <span class="badge badge-pill badge-info m-1" *ngFor="let tag of task.tags">{{ tag }}</span>
@@ -24,17 +24,17 @@
                 </li>
             </ul>
             <div class="m-1 ml-3">  
-                <a style="font-size: small;" (click)="addTask(-1)" href="javascript:void(0)">Add card</a>
+                <a style="font-size: small;" (click)="addTask(null)" href="javascript:void(0)">Add card</a>
             </div>
         </div>
         <div class="card column-card ml-1 mr-1" style="width: 18rem;" *ngFor="let user of team.members">
             <div class="card-body pl-3 pt-2">
                 <h5> {{ user.login }} </h5>
-                <span> {{ getTasksByMembers(user.id).length }} Cards</span>
+                <span> {{ getTasksByMembers(user.login).length }} Cards</span>
             </div>
             <ul class="list-group list-group-flush tasks-list">
                 <li class="list-group-item list-of-tasks">
-                    <div class="card mb-2 task-card" *ngFor="let task of getTasksByMembers(user.id)">
+                    <div class="card mb-2 task-card" *ngFor="let task of getTasksByMembers(user.login)">
                         <span class="card-title m-2">{{ task.title }}</span>
                         <div class="container tags-columns">
                             <span class="badge badge-pill badge-info m-1" *ngFor="let tag of task.tags">{{ tag }}</span>
@@ -43,7 +43,7 @@
                 </li>
             </ul>
             <div class="m-1 ml-3">  
-                <a style="font-size: small;" (click)="addTask(user.id)" href="javascript:void(0)">Add card</a>
+                <a style="font-size: small;" (click)="addTask(user.login)" href="javascript:void(0)">Add card</a>
             </div>
         </div>
     </div>

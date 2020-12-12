@@ -25,17 +25,17 @@ export class TeamComponent implements OnInit {
 
     const manager = this.authService.currentUserValue;
     
-    this.team = {id: 1, name: "team1", manager: manager, members: [new User({id: 1, login: "nanan@bla.com"}),new User({id:2,login: "blablabla@bla.com"}),new User({id:3, login: "haluu@bla.com"}),
-    new User({id:7,login: "kasia@bla.com"})]};
+    this.team = {name: "team1", department: "department1", manager: manager, members: [new User({login: "druciak"}),new User({login: "blablabla@bla.com"}),new User({login: "haluu@bla.com"}),
+    new User({login: "kasia@bla.com"}), new User({login: "dobranoc@bla.com"})]};
   }
 
-  addTask(userId: number)
+  addTask(userLogin?: string)
   {
-      this.tasksService.create(new Task({title: "added task", description: "", userId: userId, tags: []}));
+      this.tasksService.create(new Task({title: "added task", description: "", userLogin: userLogin, tags: [], teamName: this.team.name}));
   }
 
-  getTasksByMembers(userId: number)
+  getTasksByMembers(userLogin?: string)
   {
-      return this.tasksService.getTasksOf(userId);
+      return this.tasksService.getTasksOf(userLogin);
   }
 }

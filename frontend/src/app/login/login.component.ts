@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
         this.returnUrl = this.route.snapshot.queryParams.returnUrl || '/';
 
         this.form = this.fb.group({
-            email: ['', [Validators.email, Validators.required]],
+            login: ['', Validators.required],
             password: ['', Validators.required]
         });
         
@@ -48,17 +48,19 @@ export class LoginComponent implements OnInit {
 
         if (this.form.valid) {
             this.loading = true;
-            const email = this.form.get('email')!.value;
+            const login = this.form.get('login')!.value;
             const password = this.form.get('password')!.value;
-            this.authService.login(email, password).pipe(first())
-                .subscribe(
-                    data => {
-                        this.router.navigate([this.returnUrl]);
-                    },
-                    error => {
-                        this.alertService.error(error);
-                        this.loading = false;
-                    });
+            // this.authService.login(login, password).pipe(first())
+            //     .subscribe(
+            //         data => {
+            //             this.router.navigate([this.returnUrl]);
+            //         },
+            //         error => {
+            //             this.alertService.error(error);
+            //             this.loading = false;
+            //         });
+            this.authService.login(login, password);
+            this.router.navigate([this.returnUrl]);
         }
     }
 }

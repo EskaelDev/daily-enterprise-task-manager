@@ -20,8 +20,8 @@ export class TasksService {
     //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
     // }, error => console.log('Could not load tasks.'));
     const tasks: Task[] = [
-      {id:1, title: "title1", description: "", userId: 1, tags: ["tag1", "ta2", "tag5"]},
-      {id:2, title: "title2", description: "", userId: 1, tags: ["tag1"]}];
+      new Task({id:1, title: "title1", description: "", userLogin: "druciak", tags: ["tag1", "ta2", "tag5"]}),
+      new Task({id:2, title: "title2", description: "", userLogin: "druciak", tags: ["tag1"]})];
     this.dataStore.tasks = tasks;
     this._tasks.next(Object.assign({}, this.dataStore).tasks);
   }
@@ -68,8 +68,11 @@ export class TasksService {
     this._tasks.next(Object.assign({}, this.dataStore).tasks);
   }
 
-  getTasksOf(userId: number) {
-    return this.dataStore.tasks.filter(task => task.userId == userId);
+  getTasksOf(userLogin?: string) {
+    if (userLogin)
+      return this.dataStore.tasks.filter(task => task.userLogin === userLogin);
+    else
+      return this.dataStore.tasks.filter(task => !task.userLogin);
   }
 
   remove(taskId: number) {

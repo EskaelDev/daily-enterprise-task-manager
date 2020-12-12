@@ -25,13 +25,17 @@ export class AuthService {
         return this.currentUserSubject.value;
     }
 
-    login(username, password) {
-        return this.userService.getUser().pipe(map(user => {
-            // store user details and jwt token in local storage to keep user logged in between page refreshes
-            localStorage.setItem('currentUser', JSON.stringify(user));
-            this.currentUserSubject.next(user);
-            return user;
-        }));
+    login(login, password) {
+        // return this.userService.getUser(login).pipe(map(user => {
+        //     // store user details and jwt token in local storage to keep user logged in between page refreshes
+        //     localStorage.setItem('currentUser', JSON.stringify(user));
+        //     this.currentUserSubject.next(user);
+        //     return user;
+        // }));
+        const user = this.userService.getUser(login);
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.currentUserSubject.next(user);
+        return user;
     }
 
     logout(redirect: string) {
