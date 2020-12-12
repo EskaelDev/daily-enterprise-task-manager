@@ -1,26 +1,41 @@
 import User from './user.interface'
 import bcrypt from 'bcrypt'
-import DbService from '../../services/Db.service.abstract'
+import DbService from '../../services/db.service.abstract'
 import AWS, { ConfigurationOptions, DynamoDB } from 'aws-sdk';
 import { ServiceConfigurationOptions } from 'aws-sdk/lib/service';
 import DynamoUpdateModel from '../../aws/models/update.model'
 import DynamoCreateModel from '../../aws/models/create.model'
 import passport from 'passport';
 import { Strategy } from 'passport-local'
+import { Service } from 'typedi';
+import jwt from 'jsonwebtoken'
+import { ErrorCause } from 'aws-sdk/clients/qldb';
+import crypto from 'crypto'
+import { bool } from 'aws-sdk/clients/signer';
 
+@Service()
 export default class UserService extends DbService<User> {
 
 
     constructor() {
         super('Users');
 
+        this.ConfigSignup();
+        this.ConfigLogin();
     }
     public async Create(user: User): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
-        user.password = await bcrypt.hash(user.password, 10);
+        user.password = await new Promise<string>((result) => {
+
+            crypto.pbkdf2(user.password, process.env.salt || '', 100000, 64, 'sha512', (err, derivedKey) => {
+                if (err) throw err;
+
+                result(derivedKey.toString('hex'));
+            });
+        }).catch(error => { console.log(error.message); return '' });
 
         const params: DynamoCreateModel = {
             TableName: this.TABLE_NAME,
-            Item: { user }
+            Item: user
         }
 
         return this.docClient.put(params, function (err, data) {
@@ -31,8 +46,7 @@ export default class UserService extends DbService<User> {
         });
     }
 
-    // ~! Do not use
-    /** Do not use! */
+    /** Do not use! // ~! Do not use! */
     public Update(user: User): AWS.Request<DynamoDB.DocumentClient.UpdateItemOutput, AWS.AWSError> {
         throw new Error("not implemented");
 
@@ -60,6 +74,8 @@ export default class UserService extends DbService<User> {
         });
     }
 
+
+
     public GetByKey(key: string): AWS.Request<DynamoDB.DocumentClient.GetItemOutput, AWS.AWSError> {
 
         const model = {
@@ -76,10 +92,8 @@ export default class UserService extends DbService<User> {
     }
 
 
-    public async IsValid(login: string, password: string): Promise<boolean> {
-
-
-        let user = await new Promise((result) => {
+    public async GetUser(login: string): Promise<User> {
+        let user: any = await new Promise((result) => {
             let request = this.GetByKey(login);
 
             request
@@ -87,18 +101,58 @@ export default class UserService extends DbService<User> {
                     result(null)
                 })
                 .on('success', res => {
-                    result(res.data as User)
+                    result(res.data)
                 });
 
         });
-        return (user != null || await this.PasswordMatch(password, (user as User).password))
 
+        return (user.Item as User);
+    }
+
+    public async IsPasswordValid(login: string, password: string): Promise<boolean> {
+
+
+        let user: User = await this.GetUser(login);
+        if (user) {
+            let match = await this.PasswordMatch(password, (user as User).password)
+            return (match)
+        }
+        else return false;
     }
     async PasswordMatch(clientPass: string, dbPass: string): Promise<boolean> {
-        return (await bcrypt.hash(clientPass, 10)) == dbPass;
+
+        let result = await new Promise<boolean>((result) => {
+
+            crypto.pbkdf2(clientPass, process.env.salt || '', 100000, 64, 'sha512', (err, derivedKey) => {
+                if (err) throw err;
+
+                result(derivedKey.toString('hex') == dbPass);
+            });
+        });
+        return result;
+
     }
 
-    private Register() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // shit
+    private ConfigSignup() {
         passport.use('signup',
             new Strategy({
                 usernameField: 'login',
@@ -117,7 +171,7 @@ export default class UserService extends DbService<User> {
         );
     }
 
-    private Login() {
+    private ConfigLogin() {
         passport.use('login',
             new Strategy({
                 usernameField: 'login',
@@ -131,7 +185,7 @@ export default class UserService extends DbService<User> {
                             return done(null, false, { message: 'User not found' });
                         }
 
-                        const validate = await this.IsValid(login, password);
+                        const validate = await this.IsPasswordValid(login, password);
 
                         if (!validate) {
                             return done(null, false, { message: 'Wrong Password' });
@@ -145,4 +199,5 @@ export default class UserService extends DbService<User> {
             )
         );
     }
+
 }

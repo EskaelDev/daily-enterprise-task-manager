@@ -1,8 +1,8 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import * as bodyParser from 'body-parser';
-import "reflect-metadata";
 import { useExpressServer, createExpressServer } from "routing-controllers";
 import cors from 'cors';
+import passport from 'passport';
 
 export default class App {
     public app: express.Application;
@@ -22,7 +22,7 @@ export default class App {
     }
 
     private initializeMiddlewares() {
-        this.app.use(cors());
+        this.app.use(cors(), passport.initialize(), passport.session());
     }
 
     private initializeControllers() {
