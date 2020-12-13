@@ -11,6 +11,7 @@ export class TasksService {
   private _tasks = new BehaviorSubject<Task[]>([]);
   private dataStore: { tasks: Task[] } = { tasks: [] };
   readonly tasks = this._tasks.asObservable();
+  private taskId = 10;
 
   constructor(private http: HttpClient) { }
 
@@ -51,6 +52,7 @@ export class TasksService {
     //   this.dataStore.tasks.push(data);
     //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
     // }, error => console.log('Could not create task.'));
+    task.id = this.taskId++;
     this.dataStore.tasks.push(task);
     this._tasks.next(Object.assign({}, this.dataStore).tasks);
   }

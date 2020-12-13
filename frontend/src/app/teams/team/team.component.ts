@@ -6,6 +6,7 @@ import { User } from 'src/app/models/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { TasksService } from 'src/app/services/tasks.service';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-team',
@@ -14,44 +15,70 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 })
 export class TeamComponent implements OnInit {
   
-  @Input()
-  team: Team;
-  tasks: Observable<Task[]>;
-  mdlSampleIsOpen: boolean = false;
+    @Input()
+    team: Team;
+    tasks: Observable<Task[]>;
+    wasTrashClicked = false;
+    clickedTask: Task = null;
+    taskForm: FormGroup;
 
-  // icons
-  faTrash = faTrash;
+    items = ['Pizza', 'Pasta', 'Parmesan'];
 
-  constructor(private authService: AuthService, private tasksService: TasksService) { }
+    // icons
+    faTrash = faTrash;
 
-  ngOnInit(): void {
-    this.tasks = this.tasksService.tasks;
-    this.tasksService.loadAll();
+    constructor(private authService: AuthService, private tasksService: TasksService, private fb: FormBuilder,) { }
 
-    const manager = this.authService.currentUserValue;
-    
-    this.team = {name: "team1", department: "department1", manager: manager, members: [new User({login: "druciak"}),new User({login: "blablabla@bla.com"}),new User({login: "haluu@bla.com"}),
-    new User({login: "kasia@bla.com"}), new User({login: "dobranoc@bla.com"})]};
-  }
+    ngOnInit(): void {
+        this.tasks = this.tasksService.tasks;
+        this.tasksService.loadAll();
 
-  addTask(userLogin?: string)
-  {
-      this.tasksService.create(new Task({title: "added task", description: "", userLogin: userLogin, tags: [], teamName: this.team.name}));
-  }
+        const manager = this.authService.currentUserValue;
 
-  getTasksByMembers(userLogin?: string)
-  {
-      return this.tasksService.getTasksOf(userLogin);
-  }
+        this.taskForm = this.fb.group({
+            title: ['', Validators.required]
+        });
+        
+        this.team = {name: "team1", department: "department1", manager: manager, members: [new User({login: "druciak"}),new User({login: "blablabla@bla.com"}),new User({login: "haluu@bla.com"}),
+        new User({login: "kasia@bla.com"}), new User({login: "dobranoc@bla.com"})]};
+    }
 
-  onTrashClicked(taskId: number)
-  {
-    this.tasksService.remove(taskId);
-  }
+    addTask(userLogin?: string)
+    {
+        this.tasksService.create(new Task({title: "added task", description: "", userLogin: userLogin, tags: [], teamName: this.team.name}));
+    }
 
-  onTaskClicked(taskId: number)
-  {
-    this.mdlSampleIsOpen = true;
-    console.log(`Update of ${taskId}`)
-  }
+    getTasksByMembers(userLogin?: string)
+    {
+        return this.tasksService.getTasksOf(userLogin);
+    }
+
+    onTrashClicked(taskId: number)
+    {
+        this.wasTrashClicked = true;
+        console.log("On trash")
+    }
+
+    onTaskClicked(taskId: number)
+    {
+        this.tasks.subscribe(tasks => this.clickedTask = tasks.find(task => task.id == taskId));
+        console.log("On task")
+    }
+
+    closeModal()
+    {
+        this.wasTrashClicked = false;
+        this.clickedTask = null;
+    }
+
+    deleteClickedTask()
+    {
+        this.tasksService.remove(this.clickedTask.id);
+        this.closeModal();
+    }
+
+    onSubmit()
+    {
+
+    }
 }
