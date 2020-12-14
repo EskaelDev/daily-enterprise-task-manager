@@ -1,8 +1,10 @@
 <div class="search">
   <div class="team-des ml-3">
-    <h5 class="mr-1">{{ team.name }}</h5>
-    <span class="mb-2 mr-2">| {{ team.department }} </span>
-    <fa-icon role="button" class="fa-lg" style="color: #5169bb;" [icon]="faEdit" (click)="onTeamEditClicked()"></fa-icon>
+        <div class="d-flex">
+            <h5 class="mr-2">{{ team.name }}</h5>
+            <fa-icon role="button" style="color: #5169bb;" [icon]="faEdit" (click)="onTeamEditClicked()"></fa-icon>
+        </div>
+        <span class="mb-1 mr-2">{{ team.department }} </span>
   </div>
   <div class="mr-3 pb-1">
   <input class="form-control form-control-sm dark-border" id="searchInput" type="text" placeholder="Search..">
@@ -117,7 +119,7 @@
                         </div>
                     </div>
                 </div>
-                <tag-input [ngModel]="tmpTags" [ngModelOptions]="{standalone: true}" placeholder="Add tag..."></tag-input>
+                <tag-input [(ngModel)]="tmpTags" [ngModelOptions]="{standalone: true}" placeholder="Add tag..."></tag-input>
             </form>
         </div>
         <div class="modal-footer">

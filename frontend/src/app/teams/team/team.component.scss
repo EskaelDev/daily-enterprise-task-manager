@@ -1,5 +1,5 @@
 .columns {
-    height: 73vh;
+    height: 71vh;
 }
 
 .tags-columns {
@@ -57,7 +57,7 @@ a {
 
 .team-des {
     display: flex;
-    align-items: baseline;
+    flex-flow: column;
 }
 
 .duration {

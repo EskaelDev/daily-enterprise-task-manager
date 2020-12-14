@@ -60,7 +60,7 @@ export class TeamComponent implements OnInit {
             duration: [task.duration ? task.duration : '']
         });
         
-        this.tmpTags = task.tags;
+        task.tags.forEach(t => this.tmpTags.push({display: t, value: t}));
     }
 
     getTasksByMembers(userLogin?: string)
@@ -105,7 +105,8 @@ export class TeamComponent implements OnInit {
                 task.description = this.currentTaskForm.get('description').value;
                 task.userLogin = this.currentTaskForm.get('user').value === "unassigned" ? null :
                     this.currentTaskForm.get('user').value;
-                task.tags = this.tmpTags;
+                task.tags = [];
+                this.tmpTags.forEach(t => task.tags.push(t.value));
                 task.duration = this.currentTaskForm.get('duration').value;
 
                 this.tasksService.update(task);
@@ -115,10 +116,11 @@ export class TeamComponent implements OnInit {
                     description: this.currentTaskForm.get('description').value, 
                     userLogin: this.currentTaskForm.get('user').value === "unassigned" ? null :
                         this.currentTaskForm.get('user').value, 
-                    tags: this.tmpTags, 
+                    tags: [], 
                     duration: this.currentTaskForm.get('duration').value,
                     teamName: this.team.name
                 });
+                this.tmpTags.forEach(t => nTask.tags.push(t.value));
                 this.tasksService.create(nTask);
             }
             this.modalCloseButton.nativeElement.click();
