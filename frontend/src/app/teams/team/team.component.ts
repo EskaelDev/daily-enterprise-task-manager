@@ -33,13 +33,12 @@ export class TeamComponent implements OnInit {
     constructor(private authService: AuthService, private tasksService: TasksService, private fb: FormBuilder,) { }
 
     ngOnInit(): void {
-        this.tasks = this.tasksService.tasks;
-        this.tasksService.loadAll();
-
         const manager = this.authService.currentUserValue;
-        
         this.team = {name: "team1", department: "department1", manager: manager, members: [new User({login: "druciak"}),new User({login: "blablabla@bla.com"}),new User({login: "haluu@bla.com"}),
-        new User({login: "kasia@bla.com"}), new User({login: "dobranoc@bla.com"})]};
+            new User({login: "kasia@bla.com"}), new User({login: "dobranoc@bla.com"})]};
+
+        this.tasks = this.tasksService.tasks;
+        this.tasksService.loadAll(this.team.name);
     }
 
     get f() { return this.currentTaskForm.controls; }
