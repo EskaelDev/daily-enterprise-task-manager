@@ -1,11 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Task } from 'src/app/models/task';
 import { Team } from 'src/app/models/team';
 import { User } from 'src/app/models/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { TasksService } from 'src/app/services/tasks.service';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
@@ -19,13 +19,16 @@ export class TeamComponent implements OnInit {
     team: Team;
     tasks: Observable<Task[]>;
     wasTrashClicked = false;
-    clickedTask: Task = null;
-    taskForm: FormGroup;
+    clickedTask: BehaviorSubject<Task> = new BehaviorSubject<Task>(null);
+    currentTaskForm: FormGroup;
+    tmpTags = [];
+    submitted = false;
 
-    items = ['Pizza', 'Pasta', 'Parmesan'];
+    @ViewChild('modalCloseButton') modalCloseButton;
 
     // icons
     faTrash = faTrash;
+    faEdit = faEdit;
 
     constructor(private authService: AuthService, private tasksService: TasksService, private fb: FormBuilder,) { }
 
@@ -34,18 +37,31 @@ export class TeamComponent implements OnInit {
         this.tasksService.loadAll();
 
         const manager = this.authService.currentUserValue;
-
-        this.taskForm = this.fb.group({
-            title: ['', Validators.required]
-        });
         
         this.team = {name: "team1", department: "department1", manager: manager, members: [new User({login: "druciak"}),new User({login: "blablabla@bla.com"}),new User({login: "haluu@bla.com"}),
         new User({login: "kasia@bla.com"}), new User({login: "dobranoc@bla.com"})]};
     }
 
+    get f() { return this.currentTaskForm.controls; }
+
     addTask(userLogin?: string)
     {
-        this.tasksService.create(new Task({title: "added task", description: "", userLogin: userLogin, tags: [], teamName: this.team.name}));
+        this.clickedTask.next(new Task({userLogin: userLogin}));
+        this.setCurrentForm();
+    }
+
+    setCurrentForm()
+    {
+        const task = this.clickedTask.value;
+
+        this.currentTaskForm = this.fb.group({
+            title: [task.title ? task.title : '', Validators.required],
+            description: [task.description ? task.description : ''], 
+            user: [task.userLogin ? task.userLogin : 'unassigned'],
+            duration: [task.duration ? task.duration : '']
+        });
+        
+        this.tmpTags = task.tags;
     }
 
     getTasksByMembers(userLogin?: string)
@@ -56,29 +72,62 @@ export class TeamComponent implements OnInit {
     onTrashClicked(taskId: number)
     {
         this.wasTrashClicked = true;
-        console.log("On trash")
     }
 
     onTaskClicked(taskId: number)
     {
-        this.tasks.subscribe(tasks => this.clickedTask = tasks.find(task => task.id == taskId));
-        console.log("On task")
+        this.tasks.subscribe(tasks => this.clickedTask.next(tasks.find(task => task.id === taskId)));
+        this.setCurrentForm();
     }
 
     closeModal()
     {
         this.wasTrashClicked = false;
-        this.clickedTask = null;
+        this.clickedTask.next(null);
+        this.submitted = false;
+        this.tmpTags = [];
     }
 
     deleteClickedTask()
     {
-        this.tasksService.remove(this.clickedTask.id);
+        this.tasksService.remove(this.clickedTask.value.id);
         this.closeModal();
     }
 
-    onSubmit()
+    onSave()
     {
+        this.submitted = true;
+        if (this.currentTaskForm.valid)
+        {
+            let task = this.clickedTask.value;
+            if (task.id)
+            {
+                task.title = this.currentTaskForm.get('title').value;
+                task.description = this.currentTaskForm.get('description').value;
+                task.userLogin = this.currentTaskForm.get('user').value === "unassigned" ? null :
+                    this.currentTaskForm.get('user').value;
+                task.tags = this.tmpTags;
+                task.duration = this.currentTaskForm.get('duration').value;
 
+                this.tasksService.update(task);
+            } else {
+                const nTask = new Task({
+                    title: this.currentTaskForm.get('title').value, 
+                    description: this.currentTaskForm.get('description').value, 
+                    userLogin: this.currentTaskForm.get('user').value === "unassigned" ? null :
+                        this.currentTaskForm.get('user').value, 
+                    tags: this.tmpTags, 
+                    duration: this.currentTaskForm.get('duration').value,
+                    teamName: this.team.name
+                });
+                this.tasksService.create(nTask);
+            }
+            this.modalCloseButton.nativeElement.click();
+        }
+    }
+
+    onTeamEditClicked()
+    {
+        //TODO
     }
 }

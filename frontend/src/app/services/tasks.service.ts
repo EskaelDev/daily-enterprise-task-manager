@@ -23,7 +23,7 @@ export class TasksService {
     const tasks: Task[] = [
       new Task({id:1, title: "title1", description: "", userLogin: "druciak", tags: ["tag1", "ta2", "tag5"]}),
       new Task({id:2, title: "title2", description: "", userLogin: "druciak", tags: ["tag1"]}),
-      new Task({id:3, title: "title2", description: "", tags: ["tag1"]})];
+      new Task({id:3, title: "title", description: "desc", tags: ["tag"]})];
     this.dataStore.tasks = tasks;
     this._tasks.next(Object.assign({}, this.dataStore).tasks);
   }

@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
-// import { TagInputModule } from 'ngx-chips';
-// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TagInputModule } from 'ngx-chips';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -32,8 +32,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     ReactiveFormsModule,
     HttpClientModule,
     FontAwesomeModule,
-    // TagInputModule, 
-    // BrowserAnimationsModule,
+    TagInputModule, 
+    BrowserAnimationsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -54,3 +54,16 @@ a {
     display: flex;
     justify-content: flex-end;
 }
+
+.team-des {
+    display: flex;
+    align-items: baseline;
+}
+
+.duration {
+    align-items: center !important;
+}
+
+.input-group-text {
+    color: rgb(209, 205, 199);
+}

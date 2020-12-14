@@ -59,7 +59,7 @@ h2, h5, span, label, a, input, input:active {
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555; 
+    background: rgb(60, 67, 73); 
 }
 
 .navbar-brand, .nav-link.active {
@@ -84,4 +84,29 @@ h2, h5, span, label, a, input, input:active {
     background-color: rgb(24, 26, 27) !important;
     // border-color: rgba(140, 130, 115, 0.2) !important;
     outline-color: initial !important;
+}
+
+.ng2-tag-input {
+    border: none !important;
+}
+
+.ng2-tag-input__text-input {
+    display: flex !important;
+    margin-top: 1rem;
+    background-color: rgb(24,26,27);
+    border: 1px solid rgb(53,56,61) !important;
+    height: calc(1.5em + 0.5rem + 2px) !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    border-radius: 0.2rem;
+}
+
+tag{
+    color: rgb(209, 205, 199) !important;
+    background-color: rgb(23,162,184) !important;
+}
+
+.ng2-tag-input, .ng2-tags-container {
+    align-items: flex-end;
 }

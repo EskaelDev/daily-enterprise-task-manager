@@ -2,7 +2,7 @@ export class Task {
     id?: number;
     title: string;
     description: string;
-    tags: string[];
+    tags: string[] = [];
     userLogin?: string;
     teamName: string;
     language: string;
