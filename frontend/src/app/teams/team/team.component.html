@@ -1,13 +1,15 @@
 <div class="search">
-  <div class="team-des ml-3">
-        <div class="d-flex">
-            <h5 class="mr-2">{{ team.name }}</h5>
-            <fa-icon role="button" style="color: #5169bb;" [icon]="faEdit" (click)="onTeamEditClicked()"></fa-icon>
-        </div>
-        <span class="mb-1 mr-2">{{ team.department }} </span>
+  <div class="team-des ml-2 mb-2">
+        <input class="form-control form-control-sm team-desc team-name" [value]="team.name" id="team-name" type="text">
+        <input class="form-control form-control-sm team-desc" [value]="team.department" id="team-name" type="text">
   </div>
-  <div class="mr-3 pb-1">
-  <input class="form-control form-control-sm dark-border" id="searchInput" type="text" placeholder="Search..">
+  <div class="mr-3 pb-1 d-flex">
+    <select class="form-control form-control-sm dark-border mr-2" id="language">
+        <option> ENG </option>
+        <option> POL </option>
+        <option> GER </option>
+    </select>
+    <input class="form-control form-control-sm dark-border" id="searchInput" type="text" placeholder="Search..">
 </div>
 </div>
 <div class="overflow-auto">

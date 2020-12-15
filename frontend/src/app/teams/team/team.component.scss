@@ -38,6 +38,7 @@ a {
 .search {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .tasks-list{
@@ -66,4 +67,13 @@ a {
 
 .input-group-text {
     color: rgb(209, 205, 199);
+}
+
+.team-desc {
+    border: none;
+    background-color: rgba(0,0,0,0) !important;
+}
+
+.team-name {
+    font-weight: bold;
 }
