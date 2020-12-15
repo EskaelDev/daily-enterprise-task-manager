@@ -8,6 +8,7 @@ export class User implements IUser {
     name: string;
     surname: string;
     language: string;
+    token: string;
 
     constructor(init?:Partial<User>) {
         Object.assign(this, init);

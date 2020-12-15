@@ -47,7 +47,7 @@ const routes: Routes = [
     canActivate: [ AuthGuardService ]
 },
 {
-    path: 'teams/team/:teamId',
+    path: 'teams/team_tasks/:teamId',
     component: TeamComponent,
     data: {
         breadcrumb: null

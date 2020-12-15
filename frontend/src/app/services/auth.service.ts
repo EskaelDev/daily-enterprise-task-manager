@@ -7,6 +7,7 @@ import { IUser } from '../models/iuser';
 import { User } from '../models/user';
 import { map } from 'rxjs/operators';
 import { UserService } from './user.service';
+import jwt_decode from "jwt-decode";
 
 @Injectable({
   providedIn: 'root'
@@ -26,16 +27,15 @@ export class AuthService {
     }
 
     login(login, password) {
-        // return this.userService.getUser(login).pipe(map(user => {
-        //     // store user details and jwt token in local storage to keep user logged in between page refreshes
-        //     localStorage.setItem('currentUser', JSON.stringify(user));
-        //     this.currentUserSubject.next(user);
-        //     return user;
-        // }));
-        const user = this.userService.getUser(login);
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        this.currentUserSubject.next(user);
-        return user;
+        return this.userService.getUser(login, password).pipe(map(token => {
+            // store user details and jwt token in local storage to keep user logged in between page refreshes
+            let decoded: IUser = jwt_decode(token);
+            let user = new User(decoded);
+            user.token = token;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            this.currentUserSubject.next(user);
+            return user;
+        }));
     }
 
     logout(redirect: string) {

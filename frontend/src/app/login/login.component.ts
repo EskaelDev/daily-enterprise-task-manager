@@ -50,17 +50,17 @@ export class LoginComponent implements OnInit {
             this.loading = true;
             const login = this.form.get('login')!.value;
             const password = this.form.get('password')!.value;
-            // this.authService.login(login, password).pipe(first())
-            //     .subscribe(
-            //         data => {
-            //             this.router.navigate([this.returnUrl]);
-            //         },
-            //         error => {
-            //             this.alertService.error(error);
-            //             this.loading = false;
-            //         });
-            this.authService.login(login, password);
-            this.router.navigate([this.returnUrl]);
+            this.authService.login(login, password).pipe(first())
+                .subscribe(
+                    data => {
+                        this.router.navigate([this.returnUrl]);
+                    },
+                    error => {
+                        this.alertService.error("Incorrect login or password");
+                        this.loading = false;
+                    });
+            // this.authService.login(login, password);
+            // this.router.navigate([this.returnUrl]);
         }
     }
 }

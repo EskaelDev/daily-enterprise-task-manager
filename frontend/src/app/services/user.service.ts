@@ -17,9 +17,9 @@ export class UserService {
       return this.http.get<IUser[]>(`${environment.apiUrl}/users`);
   }
 
-  getUser(login: string) {
-    //  return this.http.get<IUser>(`${environment.apiUrl}/users/${login}`);
-    return this.user;
+  getUser(login: string, password: string) {
+      return this.http.post<string>(`${environment.apiUrl}/users/login`, {login, password});
+    // return this.user;
   }
 
   register(user: IUser) {
