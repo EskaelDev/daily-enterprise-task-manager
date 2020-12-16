@@ -20,8 +20,6 @@ export default class UserService extends DbService<User> {
     constructor() {
         super('Users');
 
-        this.ConfigSignup();
-        this.ConfigLogin();
     }
     public async Create(user: User): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
         user.password = await new Promise<string>((result) => {
@@ -133,71 +131,5 @@ export default class UserService extends DbService<User> {
 
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // shit
-    private ConfigSignup() {
-        passport.use('signup',
-            new Strategy({
-                usernameField: 'login',
-                passwordField: 'password'
-            },
-                async (login, password, done) => {
-                    try {
-                        const user = await this.Create({ login: login, password: password });
-
-                        return done(null, user);
-                    } catch (error) {
-                        done(error);
-                    }
-                }
-            )
-        );
-    }
-
-    private ConfigLogin() {
-        passport.use('login',
-            new Strategy({
-                usernameField: 'login',
-                passwordField: 'password'
-            },
-                async (login, password, done) => {
-                    try {
-                        const user = await this.GetByKey(login);
-
-                        if (!user) {
-                            return done(null, false, { message: 'User not found' });
-                        }
-
-                        const validate = await this.IsPasswordValid(login, password);
-
-                        if (!validate) {
-                            return done(null, false, { message: 'Wrong Password' });
-                        }
-
-                        return done(null, user, { message: 'Logged in Successfully' });
-                    } catch (error) {
-                        return done(error);
-                    }
-                }
-            )
-        );
-    }
 
 }
