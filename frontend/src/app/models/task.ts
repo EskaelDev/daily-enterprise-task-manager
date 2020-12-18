@@ -15,7 +15,7 @@ export class Task {
 }
 
 export enum Status {
-    InProgress,
     ToDo,
+    InProgress,
     Done
 }

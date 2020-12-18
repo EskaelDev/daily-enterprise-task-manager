@@ -5,8 +5,9 @@ import { Team } from 'src/app/models/team';
 import { User } from 'src/app/models/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { TasksService } from 'src/app/services/tasks.service';
-import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { faTrash, faEdit, faBell } from '@fortawesome/free-solid-svg-icons';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Language } from 'src/app/models/language.enum';
 
 @Component({
   selector: 'app-team',
@@ -17,18 +18,29 @@ export class TeamComponent implements OnInit {
   
     @Input()
     team: Team;
+
     tasks: Observable<Task[]>;
-    wasTrashClicked = false;
     clickedTask: BehaviorSubject<Task> = new BehaviorSubject<Task>(null);
+    
+    wasTrashClicked = false;
+    wasNotifyClicked = false;
+    
     currentTaskForm: FormGroup;
+    teamNameForm: FormGroup;
+    teamDepartmentForm: FormGroup;
+    teamLanguageControl: FormControl;
+
     tmpTags = [];
     submitted = false;
+    loadingName = false;
+    loadingDepartment = false;
 
     @ViewChild('modalCloseButton') modalCloseButton;
 
     // icons
     faTrash = faTrash;
     faEdit = faEdit;
+    faBell = faBell;
 
     constructor(private authService: AuthService, private tasksService: TasksService, private fb: FormBuilder,) { }
 
@@ -38,7 +50,21 @@ export class TeamComponent implements OnInit {
             new User({login: "kasia@bla.com"}), new User({login: "dobranoc@bla.com"})]};
 
         this.tasks = this.tasksService.tasks;
-        this.tasksService.loadAll(this.team.name);
+        this.tasksService.loadAll(this.team.name, manager.language);
+
+        this.teamLanguageControl = new FormControl(manager.language);
+
+        this.teamLanguageControl.valueChanges.subscribe((language: any) => {
+            this.onLanguageChange(language);
+        });
+
+        this.teamNameForm = this.fb.group({
+            teamName: [this.team.name, Validators.required]
+        });
+
+        this.teamDepartmentForm = this.fb.group({
+            departmentName: [this.team.department, Validators.required]
+        });
     }
 
     get f() { return this.currentTaskForm.controls; }
@@ -57,8 +83,11 @@ export class TeamComponent implements OnInit {
             title: [task.title ? task.title : '', Validators.required],
             description: [task.description ? task.description : ''], 
             user: [task.userLogin ? task.userLogin : 'unassigned'],
-            duration: [task.duration ? task.duration : '']
+            duration: [task.duration ? task.duration : ''],
+            status: [task.status]
         });
+
+        this.tmpTags = [];
         
         task.tags.forEach(t => this.tmpTags.push({display: t, value: t}));
     }
@@ -68,7 +97,7 @@ export class TeamComponent implements OnInit {
         return this.tasksService.getTasksOf(userLogin);
     }
 
-    onTrashClicked(taskId: number)
+    onTrashClicked()
     {
         this.wasTrashClicked = true;
     }
@@ -82,15 +111,26 @@ export class TeamComponent implements OnInit {
     closeModal()
     {
         this.wasTrashClicked = false;
+        this.wasNotifyClicked = false;
         this.clickedTask.next(null);
         this.submitted = false;
-        this.tmpTags = [];
     }
 
     deleteClickedTask()
     {
         this.tasksService.remove(this.clickedTask.value.id);
         this.closeModal();
+    }
+
+    notifyClickedTask()
+    {
+        // TODO make notifying
+    }
+
+    outsideClicked()
+    {
+        this.wasTrashClicked = false;
+        this.wasNotifyClicked = false;
     }
 
     onSave()
@@ -108,7 +148,7 @@ export class TeamComponent implements OnInit {
                 task.tags = [];
                 this.tmpTags.forEach(t => task.tags.push(t.value));
                 task.duration = this.currentTaskForm.get('duration').value;
-
+                task.status = this.currentTaskForm.get('status').value;
                 this.tasksService.update(task);
             } else {
                 const nTask = new Task({
@@ -118,7 +158,8 @@ export class TeamComponent implements OnInit {
                         this.currentTaskForm.get('user').value, 
                     tags: [], 
                     duration: this.currentTaskForm.get('duration').value,
-                    teamName: this.team.name
+                    teamName: this.team.name,
+                    status: this.currentTaskForm.get('status').value
                 });
                 this.tmpTags.forEach(t => nTask.tags.push(t.value));
                 this.tasksService.create(nTask);
@@ -127,8 +168,31 @@ export class TeamComponent implements OnInit {
         }
     }
 
-    onTeamEditClicked()
+    onLanguageChange(language: Language)
     {
-        //TODO
+        this.tasksService.loadAll(this.team.name, language);
+    }
+
+    onTeamNameChange()
+    {
+        // TODO
+        this.loadingName = true;
+        console.log(`Change team name to: ${this.teamNameForm.get('teamName').value}`);
+        this.loadingName = false;
+        // this.teamService.changeName(this.team.name, name);
+    }
+
+    onTeamDepartmentChange()
+    {
+        // TODO
+        this.loadingDepartment = true;
+        console.log(`Change team department to: ${this.teamDepartmentForm.get('departmentName').value}`);
+        this.loadingDepartment = false;
+        // this.teamService.changeDepartment(this.team.department, name);
+    }
+
+    onNotifyClicked()
+    {
+        this.wasNotifyClicked = true;
     }
 }

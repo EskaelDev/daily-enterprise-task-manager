@@ -10,7 +10,6 @@ import { User } from '../models/user';
   providedIn: 'root'
 })
 export class UserService {
-  user: IUser = new User({login: "druciak", role: Role.Manager, name: "Aleksandra", surname: "Druciak", language: "EN"});
   constructor(private http: HttpClient) { }
 
   getAll() {
@@ -19,7 +18,6 @@ export class UserService {
 
   getUser(login: string, password: string) {
       return this.http.post<string>(`${environment.apiUrl}/users/login`, {login, password});
-    // return this.user;
   }
 
   register(user: IUser) {

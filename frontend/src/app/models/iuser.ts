@@ -1,3 +1,4 @@
+import { Language } from './language.enum';
 import { Role } from './role.enum';
 
 export interface IUser {
@@ -6,6 +7,6 @@ export interface IUser {
     role: Role;
     name: string;
     surname: string;
-    language: string;
+    language: Language;
     token?: string;
 }

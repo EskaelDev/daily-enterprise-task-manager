@@ -14,6 +14,7 @@ import { TeamComponent } from './teams/team/team.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { TeamsComponent } from './teams/teams.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { ClickOutsideModule } from 'ng-click-outside';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     FontAwesomeModule,
     TagInputModule, 
     BrowserAnimationsModule,
+    ClickOutsideModule
   ],
   providers: [],
   bootstrap: [AppComponent]

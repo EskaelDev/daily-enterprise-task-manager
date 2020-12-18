@@ -1,16 +1,26 @@
 <div class="search">
-  <div class="team-des ml-2 mb-2">
-        <input class="form-control form-control-sm team-desc team-name" [value]="team.name" id="team-name" type="text">
-        <input class="form-control form-control-sm team-desc" [value]="team.department" id="team-name" type="text">
-  </div>
-  <div class="mr-3 pb-1 d-flex">
-    <select class="form-control form-control-sm dark-border mr-2" id="language">
-        <option> ENG </option>
-        <option> POL </option>
-        <option> GER </option>
-    </select>
-    <input class="form-control form-control-sm dark-border" id="searchInput" type="text" placeholder="Search..">
-</div>
+    <div class="team-des ml-2 mb-2">
+        <form [formGroup]="teamNameForm" (focusout)="onTeamNameChange()">
+            <div class="input-group loading">
+                <input class="form-control form-control-sm team-desc team-name" id="team-name" type="text" formControlName="teamName">
+                <span *ngIf="loadingName" class="spinner-border spinner-border-sm ml-2"></span>
+            </div>
+        </form>
+        <form [formGroup]="teamDepartmentForm" (focusout)="onTeamDepartmentChange()">
+            <div class="input-group loading">
+                <input class="form-control form-control-sm team-desc" id="team-dep" type="text" formControlName="departmentName">
+                <span *ngIf="loadingDepartment" class="spinner-border spinner-border-sm ml-2"></span>
+            </div>
+        </form>
+    </div>
+    <div class="mr-3 pb-1 d-flex">
+        <select role="button" class="form-control form-control-sm dark-border mr-2" id="language" [formControl]="teamLanguageControl">
+            <option value="0"> ENG </option>
+            <option value="1"> POL </option>
+            <option value="2"> GER </option>
+        </select>
+        <input class="form-control form-control-sm dark-border" id="searchInput" type="text" placeholder="Search..">
+    </div>
 </div>
 <div class="overflow-auto">
     <div class="d-flex flex-row columns">
@@ -24,7 +34,10 @@
                     <div role="button" class="card mb-2 task-card dark-border" *ngFor="let task of getTasksByMembers(null)" data-toggle="modal" data-target="#taskModal" (click)="onTaskClicked(task.id)">
                         <div class="actions ml-2 mt-2 mr-2">
                             <span class="card-title">{{ task.title }}</span>
-                            <fa-icon role="button" class="fa-sm" style="color: rgba(148, 26, 37, 1);" [icon]="faTrash" (click)="onTrashClicked()"></fa-icon>
+                            <div>
+                                <fa-icon role="button" class="fa-sm mr-2" style="color: rgba(148, 26, 37, 1);" [icon]="faTrash" (click)="onTrashClicked()"></fa-icon>
+                                <fa-icon role="button" class="fa-sm" style="color: rgba(255, 193, 7, 1);" [icon]="faBell" (click)="onNotifyClicked()"></fa-icon>
+                            </div>
                         </div>
                         <div class="container tags-columns">
                             <span class="badge badge-pill badge-info mr-1 mb-2" *ngFor="let tag of task.tags">{{ tag }}</span>
@@ -46,7 +59,10 @@
                     <div role="button" class="card mb-2 task-card dark-border" *ngFor="let task of getTasksByMembers(user.login)" data-toggle="modal" data-target="#taskModal" (click)="onTaskClicked(task.id)">
                         <div class="actions ml-2 mt-2 mr-2">
                             <span class="card-title">{{ task.title }}</span>
-                            <fa-icon class="fa-sm" style="color: rgba(148, 26, 37, 1);" [icon]="faTrash" (click)="onTrashClicked()"></fa-icon>
+                            <div>
+                                <fa-icon class="fa-sm mr-2" style="color: rgba(148, 26, 37, 1);" [icon]="faTrash" (click)="onTrashClicked()"></fa-icon>
+                                <fa-icon role="button" class="fa-sm" style="color: rgba(255, 193, 7, 1);" [icon]="faBell" (click)="onNotifyClicked()"></fa-icon>
+                            </div>
                         </div>
                         <div class="container tags-columns">
                             <span role="button" class="badge badge-pill badge-info mr-1 mb-2" *ngFor="let tag of task.tags">{{ tag }}</span>
@@ -62,7 +78,7 @@
 </div>
 
   <!-- Delete Modal -->
-<div *ngIf="wasTrashClicked" class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div *ngIf="wasTrashClicked && clickedTask.value" class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" (clickOutside)="outsideClicked()">
 <div class="modal-dialog" role="document">
     <div class="modal-content">
     <div class="modal-header">
@@ -72,7 +88,7 @@
         </button>
     </div>
     <div class="modal-body">
-        <span>Are you sure to delete {{ clickedTask.title }} task?</span>
+        <span>Are you sure to delete {{ clickedTask.value.title }} task?</span>
     </div>
     <div class="container mb-3 buttons-container">
         <button type="button" class="btn btn-secondary btn-sm mr-2" data-dismiss="modal" (click)="closeModal()">Cancel</button>
@@ -82,8 +98,29 @@
 </div>
 </div>
 
+<!-- Notify Modal -->
+<div *ngIf="wasNotifyClicked && clickedTask.value" class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" (clickOutside)="outsideClicked()">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirm</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeModal()">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <span>Are you sure to notify user of {{ clickedTask.value.title }} task?</span>
+    </div>
+    <div class="container mb-3 buttons-container">
+        <button type="button" class="btn btn-secondary btn-sm mr-2" data-dismiss="modal" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-warning btn-sm" data-dismiss="modal" (click)="notifyClickedTask()">Notify</button>
+    </div>
+    </div>
+</div>
+</div>
+
 <!-- Task Modal -->
-<div *ngIf="!wasTrashClicked && clickedTask.value" class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div *ngIf="!wasTrashClicked && !wasNotifyClicked && clickedTask.value" class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
         <div class="modal-header">
@@ -120,6 +157,14 @@
                             <span class="input-group-text dark-border dark-input">h</span>
                         </div>
                     </div>
+                </div>
+                <div class="d-flex mb-2" style="align-items: center;">
+                    <label for="status">Status: </label>
+                    <select class="form-control form-control-sm dark-border ml-3" style="max-width: 120px;" id="status" formControlName="status">
+                        <option value="0"> To Do </option>
+                        <option value="1"> In Progress </option>
+                        <option value="2"> Done </option>
+                    </select>
                 </div>
                 <tag-input [(ngModel)]="tmpTags" [ngModelOptions]="{standalone: true}" placeholder="Add tag..."></tag-input>
             </form>

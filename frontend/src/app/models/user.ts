@@ -1,4 +1,5 @@
 import { IUser } from './iuser';
+import { Language } from './language.enum';
 import { Role } from './role.enum';
 
 export class User implements IUser {
@@ -7,7 +8,7 @@ export class User implements IUser {
     role: Role = Role.Worker;
     name: string;
     surname: string;
-    language: string;
+    language: Language;
     token: string;
 
     constructor(init?:Partial<User>) {

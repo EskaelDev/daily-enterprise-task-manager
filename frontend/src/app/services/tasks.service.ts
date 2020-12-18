@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { Language } from '../models/language.enum';
 import { Task } from '../models/task';
 
 @Injectable({
@@ -15,16 +16,21 @@ export class TasksService {
 
   constructor(private http: HttpClient) { }
 
-  loadAll(teamName: string) {
+  loadAll(teamName: string, language: Language) {
     // this.http.get<Task[]>(`${environment.apiUrl}/tasks`).subscribe(data => {
     //   this.dataStore.tasks = data;
     //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
     // }, error => console.log('Could not load tasks.'));
-    const tasks: Task[] = [
+    const tasksEng: Task[] = [
       new Task({id:1, title: "title1", description: "", userLogin: "druciak", tags: ["tag1", "ta2", "tag5"], teamName: 'team1'}),
       new Task({id:2, title: "title2", description: "", userLogin: "druciak", tags: ["tag1"], teamName: 'team2'}),
       new Task({id:3, title: "title", description: "desc", tags: ["tag"], teamName: 'team1'})];
-    this.dataStore.tasks = tasks.filter(task => task.teamName === teamName);
+
+    const tasksPol: Task[] = [
+        new Task({id:1, title: "tytuł1", description: "", userLogin: "druciak", tags: ["tag1", "ta2", "tag5"], teamName: 'team1'}),
+        new Task({id:2, title: "tytuł2", description: "", userLogin: "druciak", tags: ["tag1"], teamName: 'team2'}),
+        new Task({id:3, title: "tytuał", description: "opis", tags: ["tag"], teamName: 'team1'})];
+    this.dataStore.tasks = (language == Language.ENG ? tasksEng : tasksPol).filter(task => task.teamName === teamName);
     this._tasks.next(Object.assign({}, this.dataStore).tasks);
   }
 
