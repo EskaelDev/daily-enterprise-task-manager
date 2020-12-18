@@ -1,8 +1,9 @@
 import { Service } from "typedi";
 import crypto from 'crypto'
-import User from '../api/users/user.service'
+import User, { Role } from '../api/users/user.interface'
 import UserService from "../api/users/user.service";
 import jwt from 'jsonwebtoken'
+import jwt_decode from "jwt-decode";
 @Service()
 export default class AuthorizationService {
 
@@ -28,5 +29,45 @@ export default class AuthorizationService {
 
         let token = jwt.sign(user, process.env.TOKEN_SECRET as string, { expiresIn: '2h' })
         return token;
+    }
+
+    private ExtractUserFromToken(decodedToken: any): User {
+        return {
+            login: decodedToken.login,
+            password: decodedToken.password,
+            role: decodedToken.role,
+            language: decodedToken.language,
+            name: decodedToken.name,
+            surname: decodedToken.surname
+        }
+    }
+
+    public IsAdmin(token: string) {
+        let user: User = this.ExtractUserFromToken(jwt_decode(token));
+        return user.role == Role.Admin
+    }
+    public NotAdmin(token: string) {
+        let user: User = this.ExtractUserFromToken(jwt_decode(token));
+        return user.role != Role.Admin
+    }
+
+
+    public IsManager(token: string) {
+        let user: User = this.ExtractUserFromToken(jwt_decode(token));
+        return user.role == Role.Manager
+    }
+
+    public NotManager(token: string) {
+        let user: User = this.ExtractUserFromToken(jwt_decode(token));
+        return user.role != Role.Manager
+    }
+
+    public IsWorker(token: string) {
+        let user: User = this.ExtractUserFromToken(jwt_decode(token));
+        return user.role == Role.Worker
+    }
+    public NotWorker(token: string) {
+        let user: User = this.ExtractUserFromToken(jwt_decode(token));
+        return user.role != Role.Worker
     }
 }
