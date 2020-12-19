@@ -1,5 +1,5 @@
 export default interface ApiResponse {
-    statusCode: number;
+    successful: boolean;
     body: any;
     caller: {
         class: string;
