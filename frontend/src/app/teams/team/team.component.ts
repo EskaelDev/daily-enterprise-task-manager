@@ -127,12 +127,6 @@ export class TeamComponent implements OnInit {
         // TODO make notifying
     }
 
-    outsideClicked()
-    {
-        this.wasTrashClicked = false;
-        this.wasNotifyClicked = false;
-    }
-
     onSave()
     {
         this.submitted = true;

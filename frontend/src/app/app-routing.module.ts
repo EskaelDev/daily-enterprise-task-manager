@@ -8,50 +8,35 @@ import { TeamsComponent } from './teams/teams.component';
 
 const routes: Routes = [
 {
-    // path: '',
-    // data: {
-    //     breadcrumb: 'Home'
-    // },
-    // children: [
-    //     {
-    //         path: 'team',
-    //         data: {
-    //             breadcrumb: 'Team'
-    //         },
-    //         children: [
-    //             {
-    //                 path: '',
-    //                 data: {
-    //                     breadcrumb: null
-    //                 },
-    //                 component: TeamComponent
-    //             }
-    //         ]
-    //     }
-    // ],
-    // component: HomeComponent,
-    // canActivate: [ AuthGuardService ]
     path: '',
-    component: HomeComponent,
     data: {
-        breadcrumb: "Home"
+        breadcrumb: 'Home'
     },
-    canActivate: [ AuthGuardService ]
-},
-{
-    path: 'teams',
-    component: TeamsComponent,
-    data: {
-        breadcrumb: "Teams"
-    },
-    canActivate: [ AuthGuardService ]
-},
-{
-    path: 'teams/team/:teamId',
-    component: TeamComponent,
-    data: {
-        breadcrumb: null
-    },
+    children: [
+        {
+            path: '',
+            component: HomeComponent
+        },
+        {
+            path: 'teams',
+            data: {
+                breadcrumb: 'Teams'
+            },
+            children: [
+                {
+                    path: '',
+                    component: TeamsComponent
+                },
+                {
+                    path: ':teamName',
+                    data: {
+                        breadcrumb: null
+                    },
+                    component: TeamComponent
+                }
+            ]
+        }
+    ],
     canActivate: [ AuthGuardService ]
 },
 {
