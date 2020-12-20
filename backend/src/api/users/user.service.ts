@@ -21,7 +21,7 @@ export default class UserService extends DbService<User> {
         super('Users');
 
     }
-    public async Create(user: User): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
+    public async Put(user: User): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
         user.password = await new Promise<string>((result) => {
 
             crypto.pbkdf2(user.password, process.env.salt || '', 100000, 64, 'sha512', (err, derivedKey) => {
@@ -45,43 +45,43 @@ export default class UserService extends DbService<User> {
     }
 
     /** Do not use! // ~! Do not use! */
-    public Update(user: User): AWS.Request<DynamoDB.DocumentClient.UpdateItemOutput, AWS.AWSError> {
-        throw new Error("not implemented");
+    // public Update(user: User): AWS.Request<DynamoDB.DocumentClient.UpdateItemOutput, AWS.AWSError> {
+    //     throw new Error("not implemented");
 
 
-        // TODO: asure UpdateExpression and ExpressionAttributeValues match all User properties
-        let model: DynamoUpdateModel = {
-            TableName: this.TABLE_NAME,
-            Key: {
-                'login': user.login
-            },
-            UpdateExpression: `set info.rating = :r, info.plot=:p, info.actors=:a`,
-            ExpressionAttributeValues: {
-                ":r": 5.5,
-                ":p": "Everything happens all at once.",
-                ":a": ["Larry", "Moe", "Curly"]
-            },
-            ReturnValues: "UPDATED_NEW"
-        }
+    //     // TODO: asure UpdateExpression and ExpressionAttributeValues match all User properties
+    //     let model: DynamoUpdateModel = {
+    //         TableName: this.TABLE_NAME,
+    //         Key: {
+    //             'login': user.login
+    //         },
+    //         UpdateExpression: `set info.rating = :r, info.plot=:p, info.actors=:a`,
+    //         ExpressionAttributeValues: {
+    //             ":r": 5.5,
+    //             ":p": "Everything happens all at once.",
+    //             ":a": ["Larry", "Moe", "Curly"]
+    //         },
+    //         ReturnValues: "UPDATED_NEW"
+    //     }
 
-        return this.docClient.update(model, function (err, data) {
-            if (err) {
-                return err;
-            }
-            return data;
-        });
-    }
+    //     return this.docClient.update(model, function (err, data) {
+    //         if (err) {
+    //             return err;
+    //         }
+    //         return data;
+    //     });
+    // }
 
 
 
     public GetByKey(key: string): AWS.Request<DynamoDB.DocumentClient.GetItemOutput, AWS.AWSError> {
 
-        const model = {
+        const params = {
             TableName: this.TABLE_NAME,
             Key: { 'login': key }
         };
 
-        return this.docClient.get(model, function (err, data) {
+        return this.docClient.get(params, function (err, data) {
             if (err) {
                 return err;
             }

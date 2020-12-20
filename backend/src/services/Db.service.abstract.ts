@@ -9,7 +9,7 @@ export default abstract class DbService<T> {
     docClient: AWS.DynamoDB.DocumentClient;
 
     /**
-     *
+     * Sets tablename and dynamo client
      */
     constructor(tableName: string) {
         this.serviceConfigOptions = {
@@ -22,7 +22,7 @@ export default abstract class DbService<T> {
         this.docClient = new AWS.DynamoDB.DocumentClient();
     }
 
-    Create(enity: T): any { };
-    Update(enity: T): any { };
+    Put(enity: T): any { };
+    // Update(enity: T): any { };
     GetByKey(key: any): any { };
 }
