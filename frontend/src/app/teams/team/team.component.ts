@@ -1,13 +1,17 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Task } from 'src/app/models/task';
 import { Team } from 'src/app/models/team';
-import { User } from 'src/app/models/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { TasksService } from 'src/app/services/tasks.service';
-import { faTrash, faEdit, faBell } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faEdit, faBell, faTintSlash } from '@fortawesome/free-solid-svg-icons';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Language } from 'src/app/models/language.enum';
+import { TeamsService } from 'src/app/services/teams.service';
+import { ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { logWarnings } from 'protractor/built/driverProviders';
 
 @Component({
   selector: 'app-team',
@@ -15,11 +19,8 @@ import { Language } from 'src/app/models/language.enum';
   styleUrls: ['./team.component.scss']
 })
 export class TeamComponent implements OnInit {
-  
-    @Input()
     team: Team;
-
-    tasks: Observable<Task[]>;
+    tasksByMembers: Map<string, Task[]>;
     clickedTask: BehaviorSubject<Task> = new BehaviorSubject<Task>(null);
     
     wasTrashClicked = false;
@@ -42,28 +43,47 @@ export class TeamComponent implements OnInit {
     faEdit = faEdit;
     faBell = faBell;
 
-    constructor(private authService: AuthService, private tasksService: TasksService, private fb: FormBuilder,) { }
+    constructor(private authService: AuthService, private tasksService: TasksService, 
+        private teamsService: TeamsService, private fb: FormBuilder, private route: ActivatedRoute,
+        private cdRef: ChangeDetectorRef) { }
+
+    ngAfterViewChecked() {
+            this.cdRef.detectChanges();
+    }
 
     ngOnInit(): void {
         const manager = this.authService.currentUserValue;
-        this.team = {name: "team1", department: "department1", manager: manager, members: [new User({login: "druciak"}),new User({login: "blablabla@bla.com"}),new User({login: "haluu@bla.com"}),
-            new User({login: "kasia@bla.com"}), new User({login: "dobranoc@bla.com"})]};
 
-        this.tasks = this.tasksService.tasks;
-        this.tasksService.loadAll(this.team.name, manager.language);
+        this.route.params.pipe(map(p => p.teamName)).subscribe(teamName => {
+                this.teamsService.loadAll(manager.login);
+                this.team = this.teamsService.getTeam(teamName);
 
-        this.teamLanguageControl = new FormControl(manager.language);
-
-        this.teamLanguageControl.valueChanges.subscribe((language: any) => {
-            this.onLanguageChange(language);
-        });
-
-        this.teamNameForm = this.fb.group({
-            teamName: [this.team.name, Validators.required]
-        });
-
-        this.teamDepartmentForm = this.fb.group({
-            departmentName: [this.team.department, Validators.required]
+                // this.tasks = this.tasksService.tasks;
+                this.tasksService.tasksByMembers.subscribe(tasksByMembers =>
+                    {
+                        this.tasksByMembers = tasksByMembers
+                        this.team.members.forEach(member => 
+                            {
+                                if (!this.tasksByMembers.has(member.login))
+                                    this.tasksByMembers.set(member.login, []);
+                            });
+                    }
+                );
+                this.tasksService.loadAll(this.team.name, manager.language);
+        
+                this.teamLanguageControl = new FormControl(manager.language);
+        
+                this.teamLanguageControl.valueChanges.subscribe((language: any) => {
+                    this.onLanguageChange(language);
+                });
+        
+                this.teamNameForm = this.fb.group({
+                    teamName: [this.team.name, Validators.required]
+                });
+        
+                this.teamDepartmentForm = this.fb.group({
+                    departmentName: [this.team.department, Validators.required]
+                });
         });
     }
 
@@ -92,19 +112,14 @@ export class TeamComponent implements OnInit {
         task.tags.forEach(t => this.tmpTags.push({display: t, value: t}));
     }
 
-    getTasksByMembers(userLogin?: string)
-    {
-        return this.tasksService.getTasksOf(userLogin);
-    }
-
     onTrashClicked()
     {
         this.wasTrashClicked = true;
     }
 
-    onTaskClicked(taskId: number)
+    onTaskClicked(userLogin: string, taskId: number)
     {
-        this.tasks.subscribe(tasks => this.clickedTask.next(tasks.find(task => task.id === taskId)));
+        this.clickedTask.next(this.tasksByMembers.get(userLogin).find(task => task.id === taskId));
         this.setCurrentForm();
     }
 
@@ -118,7 +133,7 @@ export class TeamComponent implements OnInit {
 
     deleteClickedTask()
     {
-        this.tasksService.remove(this.clickedTask.value.id);
+        this.tasksService.remove(this.clickedTask.value);
         this.closeModal();
     }
 
@@ -188,5 +203,25 @@ export class TeamComponent implements OnInit {
     onNotifyClicked()
     {
         this.wasNotifyClicked = true;
+    }
+
+    drop(event: CdkDragDrop<Task[]>) {
+        if (event.previousContainer === event.container) {
+          moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+        } else {
+            transferArrayItem(event.previousContainer.data,
+                event.container.data,
+                event.previousIndex,
+                event.currentIndex);
+            let task = event.container.data[event.currentIndex];
+            task.userLogin = event.container.id;
+            this.tasksService.update(task);
+        }
+    }
+
+    get columnsIds(): string[] {
+        let logins = this.team.members.map(member => member.login);
+        logins.push('unassigned');
+        return logins;
     }
 }

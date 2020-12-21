@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Team } from '../models/team';
 import { User } from '../models/user';
 import { AuthService } from '../services/auth.service';
+import { TeamsService } from '../services/teams.service';
 
 @Component({
   selector: 'app-teams',
@@ -9,18 +11,14 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./teams.component.scss']
 })
 export class TeamsComponent implements OnInit {
-  teams: Team[];
+  teams: Observable<Team[]>;
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private teamsService: TeamsService) { }
 
   ngOnInit(): void {
-    const manager = this.authService.currentUserValue;
+    const user = this.authService.currentUserValue;
 
-    this.teams = [
-      {name: "team1", department: "department1", manager: manager, members: [new User({login: "nanan@bla.com"}),new User({login: "blablabla@bla.com"}),
-      new User({login: "haluu@bla.com"}), new User({login: "kasia@bla.com"})]},
-      {name: "team2", department: "department2", manager: manager, members: [new User({login: "dobranoc@bla.com"})]}
-    ];
+    this.teams = this.teamsService.teams;
+    this.teamsService.loadAll(user.login);
   }
-
 }

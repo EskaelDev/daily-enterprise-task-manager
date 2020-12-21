@@ -27,11 +27,11 @@
         <div class="card column-card ml-1 mr-1 dark-border" style="width: 18rem;">
             <div class="card-body pl-3 pt-2">
                 <h5> Unassigned tasks </h5>
-                <span> {{ getTasksByMembers(null).length }} Cards</span>
+                <span> {{ tasksByMembers.get('unassigned').length }} Cards</span>
             </div>
             <ul class="list-group list-group-flush tasks-list">
-                <li class="list-group-item list-of-tasks">
-                    <div role="button" class="card mb-2 task-card dark-border" *ngFor="let task of getTasksByMembers(null)" data-toggle="modal" data-target="#taskModal" (click)="onTaskClicked(task.id)">
+                <li cdkDropList [id]="'unassigned'" class="list-group-item list-of-tasks" [cdkDropListData]="tasksByMembers.get('unassigned')" [cdkDropListConnectedTo]="columnsIds" (cdkDropListDropped)="drop($event)">
+                    <div role="button" class="card mb-2 task-card dark-border" *ngFor="let task of tasksByMembers.get('unassigned')" data-toggle="modal" data-target="#taskModal" (click)="onTaskClicked('unassigned', task.id)" cdkDrag>
                         <div class="actions ml-2 mt-2 mr-2">
                             <span class="card-title">{{ task.title }}</span>
                             <div>
@@ -51,12 +51,12 @@
         </div>
         <div class="card column-card ml-1 mr-1 dark-border" style="width: 18rem;" *ngFor="let user of team.members">
             <div class="card-body pl-3 pt-2">
-                <h5> {{ user.login }} </h5>
-                <span> {{ getTasksByMembers(user.login).length }} Cards</span>
+                <h5> {{ user.name }} {{ user.surname }} </h5>
+                <span> {{ tasksByMembers.get(user.login).length }} Cards</span>
             </div>
             <ul class="list-group list-group-flush tasks-list">
-                <li class="list-group-item list-of-tasks">
-                    <div role="button" class="card mb-2 task-card dark-border" *ngFor="let task of getTasksByMembers(user.login)" data-toggle="modal" data-target="#taskModal" (click)="onTaskClicked(task.id)">
+                <li cdkDropList [id]="user.login" class="list-group-item list-of-tasks" [cdkDropListData]="tasksByMembers.get(user.login)" [cdkDropListConnectedTo]="columnsIds" (cdkDropListDropped)="drop($event)">
+                    <div role="button" class="card mb-2 task-card dark-border" *ngFor="let task of tasksByMembers.get(user.login)" data-toggle="modal" data-target="#taskModal" (click)="onTaskClicked(user.login, task.id)" cdkDrag>
                         <div class="actions ml-2 mt-2 mr-2">
                             <span class="card-title">{{ task.title }}</span>
                             <div>
