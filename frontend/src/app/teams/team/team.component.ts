@@ -1,17 +1,16 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Task } from 'src/app/models/task';
 import { Team } from 'src/app/models/team';
 import { AuthService } from 'src/app/services/auth.service';
 import { TasksService } from 'src/app/services/tasks.service';
-import { faTrash, faEdit, faBell, faTintSlash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faEdit, faBell } from '@fortawesome/free-solid-svg-icons';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Language } from 'src/app/models/language.enum';
 import { TeamsService } from 'src/app/services/teams.service';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { logWarnings } from 'protractor/built/driverProviders';
 
 @Component({
   selector: 'app-team',
@@ -68,7 +67,7 @@ export class TeamComponent implements OnInit {
                             });
                     }
                 );
-                this.tasksService.loadAll(this.team.name, manager.language);
+                this.tasksService.loadAll(this.team.teamName, manager.language);
         
                 this.teamLanguageControl = new FormControl(manager.language);
         
@@ -77,7 +76,7 @@ export class TeamComponent implements OnInit {
                 });
         
                 this.teamNameForm = this.fb.group({
-                    teamName: [this.team.name, Validators.required]
+                    teamName: [this.team.teamName, Validators.required]
                 });
         
                 this.teamDepartmentForm = this.fb.group({
@@ -166,7 +165,7 @@ export class TeamComponent implements OnInit {
                         this.currentTaskForm.get('user').value, 
                     tags: [], 
                     duration: this.currentTaskForm.get('duration').value,
-                    teamName: this.team.name,
+                    teamName: this.team.teamName,
                     status: this.currentTaskForm.get('status').value
                 });
                 this.tmpTags.forEach(t => nTask.tags.push(t.value));
@@ -178,7 +177,7 @@ export class TeamComponent implements OnInit {
 
     onLanguageChange(language: Language)
     {
-        this.tasksService.loadAll(this.team.name, language); // TODO
+        this.tasksService.loadAll(this.team.teamName, language); // TODO
     }
 
     onTeamNameChange()

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Team } from '../models/team';
+import { TeamsService } from '../services/teams.service';
 
 @Component({
   selector: 'app-teams-admin',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TeamsAdminComponent implements OnInit {
 
-  constructor() { }
+  teams: Team[];
+
+  constructor(private teamsService: TeamsService) { }
 
   ngOnInit(): void {
+    this.teamsService.teams.subscribe(teams => this.teams = teams);
+    this.teamsService.loadAll();
   }
 
+  addNewTeam()
+  {
+
+  }
 }
