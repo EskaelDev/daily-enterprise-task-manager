@@ -1,8 +1,11 @@
 import AWS, { DynamoDB } from 'aws-sdk';
 import { ServiceConfigurationOptions } from 'aws-sdk/lib/service';
-import { BadRequestError, Delete, Get, JsonController } from 'routing-controllers';
+import { StatusCodes } from 'http-status-codes';
+import { BadRequestError, Delete, Get, JsonController, Res } from 'routing-controllers';
+import { Response } from 'express';
 import ApiResponse from '../utils/api-response';
 import TaskSchema from './schemas/task.schema';
+import TeamSchema from './schemas/team.schema';
 import UserSchema from './schemas/user.schema'
 
 @JsonController('/aws')
@@ -24,98 +27,73 @@ export default class TablesController {
     }
 
     @Get('/create')
-    public async createTables(): Promise<string> {
+    public async createTables(@Res() res: Response) {
 
-        let userSchema: boolean = await new Promise((result: any) => {
-            let request = this.dynamodb.createTable(UserSchema, function (err, data) {
-                if (err) {
-                    return err;
-                } else {
-                    return data;
-                }
-            });
+        let userSchema: boolean = await this.makeTable(UserSchema)
+        let taskSchema: boolean = await this.makeTable(TaskSchema)
+        let teamSchema: boolean = await this.makeTable(TeamSchema)
 
-            request
-                .on('error', res => {
-                    result(false);
-                })
-                .on('success', res => {
-                    result(true);
-                });
-
-        });
-
-        let taskSchema: boolean = await new Promise((result: any) => {
-            let request = this.dynamodb.createTable(TaskSchema, function (err, data) {
-                if (err) {
-                    return err;
-                } else {
-                    return data;
-                }
-            });
-
-            request
-                .on('error', res => {
-                    result(false);
-                })
-                .on('success', res => {
-                    result(true);
-                });
-
-        });
-
-        if (userSchema && taskSchema)
-            return "Successful";
+        if (userSchema && taskSchema && teamSchema)
+            return res.status(StatusCodes.CREATED).send('All tables created');
 
         throw new BadRequestError();
     }
 
+    private async makeTable(tableSchema: any): Promise<boolean> {
+        return new Promise((result: any) => {
+            let request = this.dynamodb.createTable(tableSchema, function (err, data) {
+                if (err) {
+                    return err;
+                } else {
+                    return data;
+                }
+            });
+
+            request
+                .on('error', res => {
+                    result(false);
+                })
+                .on('success', res => {
+                    result(true);
+                });
+
+        });
+    }
 
 
     @Delete()
-    public async deleteUsers(): Promise<string> {
+    public async deleteTables(@Res() response:Response) {
 
-        let users: boolean = await new Promise((result: any) => {
-            let request = this.dynamodb.deleteTable({ TableName: "Users" }, function (err, data) {
-                if (err) {
-                    return err
-                } else {
-                    return data
-                }
-            });
+        let users: boolean = await this.DeleteTable('Users');
+        let tasks: boolean = await this.DeleteTable('Tasks');
+        let teams: boolean = await this.DeleteTable('Teams');
 
-            request
-                .on('error', res => {
-                    result(false)
-                })
-                .on('success', res => {
-                    result(true)
-                });
-
-        });
-
-        let tasks: boolean = await new Promise((result: any) => {
-            let request = this.dynamodb.deleteTable({ TableName: "Tasks" }, function (err, data) {
-                if (err) {
-                    return err
-                } else {
-                    return data
-                }
-            });
-
-            request
-                .on('error', res => {
-                    result(false)
-                })
-                .on('success', res => {
-                    result(true)
-                });
-
-        });
-        if (users && tasks)
-            return "Successful";
+        if (users && tasks && teams)
+            return response.status(StatusCodes.OK).send('All tables deleted');
 
         throw new BadRequestError();
     }
 
+
+    private async DeleteTable(tableName: string): Promise<boolean> {
+        return await new Promise((result: any) => {
+            let request = this.dynamodb.deleteTable({ TableName: tableName }, function (err, data) {
+                if (err) {
+                    return err
+                } else {
+                    return data
+                }
+            });
+
+            request
+                .on('error', res => {
+                    result(false)
+                })
+                .on('success', res => {
+                    result(true)
+                });
+
+        });
+
+    }
 }

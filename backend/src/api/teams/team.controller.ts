@@ -4,36 +4,38 @@ import { Response } from 'express'
 import ApiResponse from "../../utils/api-response";
 import { AuthMiddleware } from "../../middleware/auth.middleware";
 import AuthService from "../../services/auth.service";
-import TaskService from "./task.service";
-import Filter from '../models/filter.model'
-import Task from "./task.interface";
-import { ReasonPhrases, StatusCodes, getReasonPhrase, getStatusCode, } from 'http-status-codes';
-@JsonController("/tasks")
-export default class TasksController {
 
-    constructor(private taskService: TaskService, private authService: AuthService) {
+import Filter from '../models/filter.model'
+import { ReasonPhrases, StatusCodes, getReasonPhrase, getStatusCode, } from 'http-status-codes';
+import TeamService from "./team.service";
+import Team from "./team.interface";
+
+@JsonController("/teams")
+export default class TeamController {
+
+
+    constructor(private teamService: TeamService, private authService: AuthService) {
 
     }
 
 
     @UseBefore(AuthMiddleware)
     @Post()
-    public async AddTask(@Res() res: Response, @Body({ required: true }) task: Task, @HeaderParam("Authorization") token: string) {
+    public async PutTeam(@Res() res: Response, @Body({ required: true }) team: Team, @HeaderParam("Authorization") token: string) {
         if (this.authService.NotAdmin(token) && this.authService.NotManager(token)) {
-
             throw new UnauthorizedError();
         }
 
         let response: ApiResponse = await new Promise(async (result) => {
-            let request = await this.taskService.Put(task);
+            let request = await this.teamService.Put(team);
 
             request
                 .on('error', res => {
                     let response: ApiResponse = {
                         successful: false,
                         caller: {
-                            class: 'TablesController',
-                            method: 'AddTask'
+                            class: 'TeamsController',
+                            method: 'PutTeam'
                         },
                         body: res.message
                     }
@@ -43,8 +45,8 @@ export default class TasksController {
                     let response: ApiResponse = {
                         successful: true,
                         caller: {
-                            class: 'TablesController',
-                            method: 'AddTask'
+                            class: 'TeamsController',
+                            method: 'PutTeam'
                         },
                         body: res.data
                     }
@@ -60,16 +62,17 @@ export default class TasksController {
     }
 
     @UseBefore(AuthMiddleware)
-    @Get('/:taskId')
-    public async GetById(@Res() res: Response, @Param('taskId') taskId: string, @HeaderParam("Authorization") token: string) {
+    @Get('/:teamName')
+    public async GetById(@Res() res: Response, @Param('teamName') teamName: string, @HeaderParam("Authorization") token: string) {
+
         let response: ApiResponse = await new Promise(async (result) => {
-            let request = await this.taskService.GetByKey(taskId);
+            let request = await this.teamService.GetByKey(teamName);
             request
                 .on('error', res => {
                     let response: ApiResponse = {
                         successful: false,
                         caller: {
-                            class: 'TasksController',
+                            class: 'TeamController',
                             method: 'GetById'
                         },
                         body: res.message
@@ -80,7 +83,7 @@ export default class TasksController {
                     let response: ApiResponse = {
                         successful: true,
                         caller: {
-                            class: 'TasksController',
+                            class: 'TeamController',
                             method: 'GetById'
                         },
                         body: res.data
@@ -101,13 +104,13 @@ export default class TasksController {
     @Post('/filter')
     public async Filter(@Res() res: Response, @Body({ required: true }) filter: Filter, @HeaderParam("Authorization") token: string) {
         let response: ApiResponse = await new Promise(async (result) => {
-            let request = await this.taskService.Filter(filter);
+            let request = await this.teamService.Filter(filter);
             request
                 .on('error', res => {
                     let response: ApiResponse = {
                         successful: false,
                         caller: {
-                            class: 'TasksController',
+                            class: 'TeamController',
                             method: 'Filter'
                         },
                         body: res.message
@@ -118,7 +121,7 @@ export default class TasksController {
                     let response: ApiResponse = {
                         successful: true,
                         caller: {
-                            class: 'TasksController',
+                            class: 'TeamController',
                             method: 'Filter'
                         },
                         body: res.data

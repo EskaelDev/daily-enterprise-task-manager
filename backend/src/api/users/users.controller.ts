@@ -5,7 +5,7 @@ import UserService from "./user.service";
 import { Response } from 'express'
 import ApiResponse from "../../utils/api-response";
 import { AuthMiddleware } from "../../middleware/auth.middleware";
-import AuthorizationService from "../../services/auth.service";
+import AuthService from "../../services/auth.service";
 import jwt_decode from "jwt-decode";
 import { HttpResponse } from "aws-sdk";
 import { StatusCodes } from "http-status-codes";
@@ -14,7 +14,7 @@ import { STATUS_CODES } from "http";
 @JsonController("/users")
 export default class UsersController {
 
-    constructor(private userService: UserService, private authService: AuthorizationService) {
+    constructor(private userService: UserService, private authService: AuthService) {
 
     }
 

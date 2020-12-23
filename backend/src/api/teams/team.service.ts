@@ -11,26 +11,23 @@ import jwt from 'jsonwebtoken'
 import { ErrorCause } from 'aws-sdk/clients/qldb';
 import crypto from 'crypto'
 import { bool } from 'aws-sdk/clients/signer';
-import Task from './task.interface';
 import { v4 as uuidv4 } from 'uuid';
 import FilterableDbService from '../../services/filterable-db.service.abstract';
+import Team from './team.interface';
 
 @Service()
-export default class TaskService extends FilterableDbService<Task> {
+export default class TeamService extends FilterableDbService<Team> {
 
 
     constructor() {
-        super('Tasks', ["id", "title", "description", "tags", "userLogin", "taskLanguage", "taskStatus", "taskDuration"]);
+        super('Teams', ["teamName", "manager", "department", "members"]);
     }
 
-    public async Put(task: Task): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
+    public async Put(team: Team): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
 
-        if (task.id == null) {
-            task.id = uuidv4();
-        }
         const params: DynamoCreateModel = {
             TableName: this.TABLE_NAME,
-            Item: task
+            Item: team
         }
 
         return this.docClient.put(params, function (err, data) {
@@ -45,7 +42,7 @@ export default class TaskService extends FilterableDbService<Task> {
 
         const params = {
             TableName: this.TABLE_NAME,
-            Key: { 'id': key }
+            Key: { 'name': key }
         };
 
         return this.docClient.get(params, function (err, data) {
