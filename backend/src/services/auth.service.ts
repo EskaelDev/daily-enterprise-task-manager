@@ -5,7 +5,7 @@ import UserService from "../api/users/user.service";
 import jwt from 'jsonwebtoken'
 import jwt_decode from "jwt-decode";
 @Service()
-export default class AuthorizationService {
+export default class AuthService {
 
     /**
      *
@@ -31,7 +31,7 @@ export default class AuthorizationService {
         return token;
     }
 
-    private ExtractUserFromToken(decodedToken: any): User {
+    public ExtractUserFromToken(decodedToken: any): User {
         return {
             login: decodedToken.login,
             password: decodedToken.password,

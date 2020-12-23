@@ -1,3 +1,5 @@
+import { Language } from "../../enums/languages.enum";
+
 export default interface Task {
     id?: string;
     title: string;
@@ -5,7 +7,7 @@ export default interface Task {
     tags: string[];
     userLogin?: string;
     teamName: string;
-    taskLanguage: string;
+    taskLanguage: Language;
     taskStatus: Status;
     taskDuration: number;
 

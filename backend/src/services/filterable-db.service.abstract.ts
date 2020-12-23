@@ -5,16 +5,17 @@ import Filter from '../api/models/filter.model';
 import DbService from './db.service.abstract';
 
 export default abstract class FilterableDbService<T> extends DbService<T>{
-
-    constructor(tableName: string) {
+    protected filterFields: string[];
+    constructor(tableName: string, filterFields: string[]) {
         super(tableName);
+        this.filterFields = filterFields;
     }
     public Filter(filter: Filter): AWS.Request<DynamoDB.DocumentClient.QueryOutput, AWS.AWSError> {
 
-
+        let ProjectionExpression = this.filterFields.join(', ');
         var params: DocumentClient.ScanInput = {
             TableName: this.TABLE_NAME,
-            ProjectionExpression: "#fl, id, title, description, tags, userLogin, taskLanguage, taskStatus, taskDuration",
+            ProjectionExpression: ProjectionExpression,
             FilterExpression: "#fl = :val",
             ExpressionAttributeNames: {
                 "#fl": filter.field,
