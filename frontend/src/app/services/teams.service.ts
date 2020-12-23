@@ -17,7 +17,12 @@ export class TeamsService {
   constructor(private http: HttpClient, private authService: AuthService) { }
 
   loadAll(managerLogin?: string) {
-    // this.http.get<Team[]>(`${environment.apiUrl}/teams`).subscribe(data => {
+    // const headers = new Headers({
+    //   'Content-Type': 'application/json',
+    //   'Authorization': `Bearer ${auth_token}`
+    // })
+    // return this.http.get(apiUrl, { headers: headers })
+    // this.http.post<Team[]>(`${environment.apiUrl}/api/teams/filter`, {field: "manager", value: managerLogin}).subscribe(data => {
     //   this.dataStore.teams = data;
     //   this._teams.next(Object.assign({}, this.dataStore).teams);
     // }, error => console.log('Could not load teams.'));

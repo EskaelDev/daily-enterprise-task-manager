@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { AuthGuardService } from './services/auth-guard.service';
+import { TeamsAdminComponent } from './teams-admin/teams-admin.component';
 import { TeamComponent } from './teams/team/team.component';
 import { TeamsComponent } from './teams/teams.component';
 
@@ -33,6 +34,18 @@ const routes: Routes = [
                         breadcrumb: null
                     },
                     component: TeamComponent
+                }
+            ]
+        },
+        {
+            path: 'teams-admin',
+            data: {
+                breadcrumb: 'Teams'
+            },
+            children: [
+                {
+                    path: '',
+                    component: TeamsAdminComponent
                 }
             ]
         }

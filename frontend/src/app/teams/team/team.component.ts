@@ -58,7 +58,6 @@ export class TeamComponent implements OnInit {
                 this.teamsService.loadAll(manager.login);
                 this.team = this.teamsService.getTeam(teamName);
 
-                // this.tasks = this.tasksService.tasks;
                 this.tasksService.tasksByMembers.subscribe(tasksByMembers =>
                     {
                         this.tasksByMembers = tasksByMembers
@@ -179,7 +178,7 @@ export class TeamComponent implements OnInit {
 
     onLanguageChange(language: Language)
     {
-        this.tasksService.loadAll(this.team.name, language);
+        this.tasksService.loadAll(this.team.name, language); // TODO
     }
 
     onTeamNameChange()

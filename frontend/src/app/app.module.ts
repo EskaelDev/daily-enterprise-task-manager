@@ -15,6 +15,7 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { TeamsComponent } from './teams/teams.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { TeamsAdminComponent } from './teams-admin/teams-admin.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     AlertComponent,
     TeamComponent,
     BreadcrumbComponent,
-    TeamsComponent
+    TeamsComponent,
+    TeamsAdminComponent
   ],
   imports: [
     BrowserModule,
