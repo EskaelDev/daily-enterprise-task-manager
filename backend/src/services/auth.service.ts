@@ -31,7 +31,7 @@ export default class AuthService {
         return token;
     }
 
-    private ExtractUserFromToken(decodedToken: any): User {
+    public ExtractUserFromToken(decodedToken: any): User {
         return {
             login: decodedToken.login,
             password: decodedToken.password,

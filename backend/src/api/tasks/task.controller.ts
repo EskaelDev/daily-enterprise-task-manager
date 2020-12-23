@@ -7,11 +7,14 @@ import AuthService from "../../services/auth.service";
 import TaskService from "./task.service";
 import Filter from '../models/filter.model'
 import Task from "./task.interface";
+import jwt_decode from "jwt-decode";
 import { ReasonPhrases, StatusCodes, getReasonPhrase, getStatusCode, } from 'http-status-codes';
+import User from "../users/user.interface";
+import TranslationService from "./translation.service";
 @JsonController("/tasks")
 export default class TasksController {
 
-    constructor(private taskService: TaskService, private authService: AuthService) {
+    constructor(private taskService: TaskService, private authService: AuthService, private translationService: TranslationService) {
 
     }
 
@@ -90,6 +93,8 @@ export default class TasksController {
         });
 
         if (response.successful) {
+            let user: User = this.authService.ExtractUserFromToken(jwt_decode(token));
+            response.body.Item.description = await this.taskService.Translate(response.body.Item.description, 'en', this.translationService.EnumToCode(user.language));
             return res.status(StatusCodes.OK).send(response);
         }
 
@@ -128,7 +133,8 @@ export default class TasksController {
         });
 
         if (response.successful) {
-
+            let user: User = this.authService.ExtractUserFromToken(jwt_decode(token));
+            response.body.Item.description = await this.taskService.Translate(response.body.Item.description, 'en', this.translationService.EnumToCode(user.language));
             return res.status(StatusCodes.OK).send(response);
         }
 
