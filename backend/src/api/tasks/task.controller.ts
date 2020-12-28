@@ -14,7 +14,9 @@ import TranslationService from "./translation.service";
 @JsonController("/tasks")
 export default class TasksController {
 
-    constructor(private taskService: TaskService, private authService: AuthService, private translationService: TranslationService) {
+    constructor(private taskService: TaskService,
+        private authService: AuthService,
+        private translationService: TranslationService) {
 
     }
 
@@ -63,6 +65,53 @@ export default class TasksController {
     }
 
     @UseBefore(AuthMiddleware)
+    @Post('/filter')
+    public async Filter(@Res() res: Response, @Body({ required: true }) filter: Filter, @HeaderParam("Authorization") token: string) {
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.taskService.Filter(filter);
+            request
+                .on('error', res => {
+                    let response: ApiResponse = {
+                        successful: false,
+                        caller: {
+                            class: 'TasksController',
+                            method: 'Filter'
+                        },
+                        body: res.message
+                    }
+                    result(response)
+                })
+                .on('success', res => {
+                    let response: ApiResponse = {
+                        successful: true,
+                        caller: {
+                            class: 'TasksController',
+                            method: 'Filter'
+                        },
+                        body: res.data
+                    }
+                    result(response)
+                });
+        });
+
+        if (response.successful) {
+            let user: User = this.authService.ExtractUserFromToken(jwt_decode(token));
+            for (let index = 0; index < response.body.Items.length; index++) {
+                let desc = response.body.Items[index].description;
+                desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(user.language));
+                response.body.Items[index].description = desc;
+            }
+
+
+            return res.status(StatusCodes.OK).send(response);
+        }
+
+        throw new BadRequestError(response.body);
+    }
+
+
+
+    @UseBefore(AuthMiddleware)
     @Get('/:taskId')
     public async GetById(@Res() res: Response, @Param('taskId') taskId: string, @HeaderParam("Authorization") token: string) {
         let response: ApiResponse = await new Promise(async (result) => {
@@ -100,44 +149,5 @@ export default class TasksController {
 
         throw new BadRequestError(response.body);
 
-    }
-
-    @UseBefore(AuthMiddleware)
-    @Post('/filter')
-    public async Filter(@Res() res: Response, @Body({ required: true }) filter: Filter, @HeaderParam("Authorization") token: string) {
-        let response: ApiResponse = await new Promise(async (result) => {
-            let request = await this.taskService.Filter(filter);
-            request
-                .on('error', res => {
-                    let response: ApiResponse = {
-                        successful: false,
-                        caller: {
-                            class: 'TasksController',
-                            method: 'Filter'
-                        },
-                        body: res.message
-                    }
-                    result(response)
-                })
-                .on('success', res => {
-                    let response: ApiResponse = {
-                        successful: true,
-                        caller: {
-                            class: 'TasksController',
-                            method: 'Filter'
-                        },
-                        body: res.data
-                    }
-                    result(response)
-                });
-        });
-
-        if (response.successful) {
-            let user: User = this.authService.ExtractUserFromToken(jwt_decode(token));
-            response.body.Item.description = await this.taskService.Translate(response.body.Item.description, 'en', this.translationService.EnumToCode(user.language));
-            return res.status(StatusCodes.OK).send(response);
-        }
-
-        throw new BadRequestError(response.body);
     }
 }
