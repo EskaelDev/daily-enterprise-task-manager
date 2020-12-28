@@ -5,7 +5,7 @@ import { Role } from './role.enum';
 export class User implements IUser {
     login: string;
     password?: string;
-    role: Role = Role.Worker;
+    role: Role;
     name: string;
     surname: string;
     language: Language;

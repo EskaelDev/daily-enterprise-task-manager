@@ -1,4 +1,4 @@
-<div class="search">
+<div *ngIf="!isLoading" class="search">
     <div class="team-des ml-2 mb-2">
         <form [formGroup]="teamNameForm" (focusout)="onTeamNameChange()">
             <div class="input-group loading">
@@ -22,7 +22,7 @@
         <input class="form-control form-control-sm dark-border" id="searchInput" type="text" placeholder="Search..">
     </div>
 </div>
-<div class="overflow-auto">
+<div *ngIf="!isLoading" class="overflow-auto">
     <div class="d-flex flex-row columns">
         <div class="card column-card ml-1 mr-1 dark-border" style="width: 18rem;">
             <div class="card-body pl-3 pt-2">
@@ -50,7 +50,7 @@
                 <a style="font-size: small;" (click)="addTask(null)" data-toggle="modal" data-target="#taskModal" href="javascript:void(0)">Add card</a>
             </div>
         </div>
-        <div class="card column-card ml-1 mr-1 dark-border" style="width: 18rem;" *ngFor="let user of team.members">
+        <div class="card column-card ml-1 mr-1 dark-border" style="width: 18rem;" *ngFor="let user of team.Members">
             <div class="card-body pl-3 pt-2">
                 <h5> {{ user.name }} {{ user.surname }} </h5>
                 <span> {{ tasksByMembers.get(user.login).length }} Cards</span>
@@ -76,6 +76,11 @@
                 <a style="font-size: small;" (click)="addTask(user.login)" href="javascript:void(0)" data-toggle="modal" data-target="#taskModal">Add card</a>
             </div>
         </div>
+    </div>
+</div>
+<div *ngIf="isLoading" class="d-flex justify-content-center" style="margin-top: 10%;">
+    <div class="spinner-grow text-dark" style="width: 5rem; height: 5rem;" role="status">
+      <span class="sr-only">Loading...</span>
     </div>
 </div>
 
@@ -148,13 +153,13 @@
                     <label for="user">Assign to</label>
                     <select class="form-control form-control-sm dark-border" id="user" formControlName="user">
                         <option value="unassigned"> unassigned </option>
-                        <option *ngFor="let user of team.members" [value]="user.login"> {{ user.login }} </option>
+                        <option *ngFor="let user of team.Members" [value]="user.login"> {{ user.login }} </option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="duration">Duration</label>
                     <div class="input-group duration">
-                    <input type="number" min="0.25" max="8.00" step="0.01" onKeyDown="if(this.value.length==2) return false;" class="form-control form-control-sm dark-border" id="duration" formControlName="duration">
+                    <input type="number" min="0.25" max="8.00" step="0.01" onKeyDown="if(this.value.length==2) return false;" class="form-control form-control-sm dark-border" id="duration" formControlName="taskDuration">
                         <div class="input-group-append">
                             <span class="input-group-text dark-border dark-input">h</span>
                         </div>
@@ -162,7 +167,7 @@
                 </div>
                 <div class="d-flex mb-2" style="align-items: center;">
                     <label for="status">Status: </label>
-                    <select class="form-control form-control-sm dark-border ml-3" style="max-width: 120px;" id="status" formControlName="status">
+                    <select class="form-control form-control-sm dark-border ml-3" style="max-width: 120px;" id="status" formControlName="taskStatus">
                         <option value="0"> To Do </option>
                         <option value="1"> In Progress </option>
                         <option value="2"> Done </option>

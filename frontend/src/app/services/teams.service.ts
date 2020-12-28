@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Team } from '../models/team';
-import { User } from '../models/user';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -27,23 +26,21 @@ export class TeamsService {
       this.dataStore.teams = data.body.Items;
       this._teams.next(Object.assign({}, this.dataStore).teams);
     }, error => console.log(error));
-    const manager = this.authService.currentUserValue;
-    let teams = [
-      {teamName: "team1", department: "department1", manager: manager, members: [new User({login: "druciak", name: "Aleksandra", surname: "Druciak"}),new User({login: "blablabla@bla.com"}),
-      new User({login: "haluu@bla.com"}), new User({login: "kasia@bla.com"})]},
-      {teamName: "team2", department: "department2", manager: manager, members: [new User({login: "dobranoc@bla.com"})]}
-    ];
-    // this.dataStore.teams = teams.filter(team => team.manager.login === managerLogin);
-    // this._teams.next(Object.assign({}, this.dataStore).teams);
   }
 
   load(name: string) {
-    this.http.get<Team>(`${environment.apiUrl}/teams/${name}`).subscribe(data => {
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    })
+    this.http.post<any>(`${environment.apiUrl}/teams/filter`, {field: "teamName", value: name}, { headers: headers}).subscribe(data => {
       let notFound = true;
+      let team = data.body.Items[0];
 
       this.dataStore.teams.forEach((item, index) => {
-        if (item.teamName === data.teamName) {
-          this.dataStore.teams[index] = data;
+        if (item.teamName === team.teamName) {
+          this.dataStore.teams[index] = team;
           notFound = false;
         }
       });
@@ -80,7 +77,7 @@ export class TeamsService {
   }
 
   getTeamsOf(managerLogin: string) {
-      return this.dataStore.teams.filter(team => team.manager.login === managerLogin);
+      return this.dataStore.teams.filter(team => team.manager === managerLogin);
   }
 
   getTeam(teamName: string) {

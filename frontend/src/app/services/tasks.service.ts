@@ -1,10 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Language } from '../models/language.enum';
 import { Task } from '../models/task';
 import { v4 as uuidv4 } from 'uuid';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,29 +15,27 @@ export class TasksService {
   private dataStore: { tasksByMembers: Map<string, Task[]>} = { tasksByMembers: new Map() };
   readonly tasksByMembers = this._tasksByMembers.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   loadAll(teamName: string, language: Language) {
-    // this.http.get<Task[]>(`${environment.apiUrl}/tasks`).subscribe(data => {
-    //   this.dataStore.tasks = data;
-    //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
-    // }, error => console.log('Could not load tasks.'));
-    const tasks: Task[] = [
-      new Task({id:1, title: "title1", description: "", userLogin: "druciak", tags: ["tag1", "ta2", "tag5"], teamName: 'team1'}),
-      new Task({id:2, title: "title2", description: "", userLogin: "druciak", tags: ["tag1"], teamName: 'team2'}),
-      new Task({id:3, title: "title", description: "desc", tags: ["tag", "tagg"], teamName: 'team1'}),
-      new Task({id:4, title: "title5", description: "desc", tags: ["tag"], teamName: 'team1'}),];
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
 
-    tasks.forEach(t => {
-      if (t.teamName === teamName) {
+    this.http.post<any>(`${environment.apiUrl}/tasks/filter/`, {field: "teamName", value: teamName}, { headers: headers}).subscribe(data => {
+      let tasks = data.body.Items;
+      this.dataStore.tasksByMembers = new Map<string, Task[]>();
+      tasks.forEach(t => {
         let userLogin = t.userLogin ? t.userLogin : 'unassigned';
         if(this.dataStore.tasksByMembers.has(userLogin))
           this.dataStore.tasksByMembers.get(userLogin).push(t);
         else
           this.dataStore.tasksByMembers.set(userLogin, [t])
-      }
-    });
-    this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
+      });
+      this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
+    }, error => console.log('Could not load tasks.'));
   }
 
 //   load(id: number | string) {

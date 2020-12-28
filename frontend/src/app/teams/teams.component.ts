@@ -1,3 +1,4 @@
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Team } from '../models/team';
@@ -11,14 +12,21 @@ import { TeamsService } from '../services/teams.service';
   styleUrls: ['./teams.component.scss']
 })
 export class TeamsComponent implements OnInit {
-  teams: Observable<Team[]>;
+  teams: Team[];
+  isLoading = true;
 
   constructor(private authService: AuthService, private teamsService: TeamsService) { }
 
   ngOnInit(): void {
     const user = this.authService.currentUserValue;
 
-    this.teams = this.teamsService.teams;
+    this.teamsService.teams.subscribe(
+      teams => {
+        this.teams = teams;
+        this.isLoading =  false;
+      }
+    );
+    this.isLoading = true;
     this.teamsService.loadAll(user.login);
   }
 }

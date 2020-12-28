@@ -1,6 +1,11 @@
-<ul class="list-group m-3">
-    <a class="list-group-item list-group-item-action mt-1" *ngFor="let team of teams | async" [routerLink]="['/teams', team.teamName]">
+<ul *ngIf="!isLoading" class="list-group m-3">
+    <a class="list-group-item list-group-item-action mt-1" *ngFor="let team of teams" [routerLink]="['/teams', team.teamName]">
         <span>{{ team.teamName }}</span>
     </a>
 </ul>
-<p *ngIf="!teams || teams.toPromise.length === 0">No teams found</p>
+<div *ngIf="isLoading" class="d-flex justify-content-center" style="margin-top: 10%;">
+    <div class="spinner-grow text-dark" style="width: 5rem; height: 5rem;" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+</div>
+<p class="m-3" *ngIf="!isLoading && (!teams || teams.length === 0)">No teams found</p>

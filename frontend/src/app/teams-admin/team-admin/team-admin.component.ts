@@ -10,7 +10,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 })
 export class TeamAdminComponent implements OnInit {
 
-    team: Team = new Team({members: [
+    team: Team = new Team({Members: [
         new User({surname: "Druciak", name: "Aleksandra", login: "sialalla"}),
         new User({surname: "Druciak", name: "Aleksandra", login: "sialalla1"}),
         new User({surname: "Druciak", name: "Aleksandra", login: "sialalla2"}),

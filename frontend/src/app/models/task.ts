@@ -1,13 +1,13 @@
 export class Task {
     id?: number;
     title: string;
-    description: string;
+    description: any;
     tags: string[] = [];
     userLogin?: string;
     teamName: string;
-    language: string;
-    status: Status = Status.ToDo;
-    duration: number;
+    taskLanguage: string;
+    taskStatus: Status = Status.ToDo;
+    taskDuration: number;
 
     constructor(init?:Partial<Task>) {
         Object.assign(this, init);

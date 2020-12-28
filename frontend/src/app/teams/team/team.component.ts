@@ -34,6 +34,7 @@ export class TeamComponent implements OnInit {
     submitted = false;
     loadingName = false;
     loadingDepartment = false;
+    isLoading = true;
 
     @ViewChild('modalCloseButton') modalCloseButton;
 
@@ -47,7 +48,7 @@ export class TeamComponent implements OnInit {
         private cdRef: ChangeDetectorRef) { }
 
     ngAfterViewChecked() {
-            this.cdRef.detectChanges();
+        this.cdRef.detectChanges();
     }
 
     ngOnInit(): void {
@@ -59,14 +60,16 @@ export class TeamComponent implements OnInit {
 
                 this.tasksService.tasksByMembers.subscribe(tasksByMembers =>
                     {
-                        this.tasksByMembers = tasksByMembers
-                        this.team.members.forEach(member => 
+                        this.tasksByMembers = tasksByMembers;
+                        this.team.Members.forEach(member => 
                             {
                                 if (!this.tasksByMembers.has(member.login))
                                     this.tasksByMembers.set(member.login, []);
                             });
+                        this.isLoading = false;
                     }
                 );
+                this.isLoading = true;
                 this.tasksService.loadAll(this.team.teamName, manager.language);
         
                 this.teamLanguageControl = new FormControl(manager.language);
@@ -101,8 +104,8 @@ export class TeamComponent implements OnInit {
             title: [task.title ? task.title : '', Validators.required],
             description: [task.description ? task.description : ''], 
             user: [task.userLogin ? task.userLogin : 'unassigned'],
-            duration: [task.duration ? task.duration : ''],
-            status: [task.status]
+            taskDuration: [task.taskDuration ? task.taskDuration : ''],
+            taskStatus: [task.taskStatus]
         });
 
         this.tmpTags = [];
@@ -154,8 +157,8 @@ export class TeamComponent implements OnInit {
                     this.currentTaskForm.get('user').value;
                 task.tags = [];
                 this.tmpTags.forEach(t => task.tags.push(t.value));
-                task.duration = this.currentTaskForm.get('duration').value;
-                task.status = this.currentTaskForm.get('status').value;
+                task.taskDuration = this.currentTaskForm.get('taskDuration').value;
+                task.taskStatus = this.currentTaskForm.get('taskStatus').value;
                 this.tasksService.update(task);
             } else {
                 const nTask = new Task({
@@ -164,9 +167,9 @@ export class TeamComponent implements OnInit {
                     userLogin: this.currentTaskForm.get('user').value === "unassigned" ? null :
                         this.currentTaskForm.get('user').value, 
                     tags: [], 
-                    duration: this.currentTaskForm.get('duration').value,
+                    taskDuration: this.currentTaskForm.get('taskDuration').value,
                     teamName: this.team.teamName,
-                    status: this.currentTaskForm.get('status').value
+                    taskStatus: this.currentTaskForm.get('taskStatus').value
                 });
                 this.tmpTags.forEach(t => nTask.tags.push(t.value));
                 this.tasksService.create(nTask);
@@ -218,7 +221,7 @@ export class TeamComponent implements OnInit {
     }
 
     get columnsIds(): string[] {
-        let logins = this.team.members.map(member => member.login);
+        let logins = this.team.Members.map(member => member.login);
         logins.push('unassigned');
         return logins;
     }
