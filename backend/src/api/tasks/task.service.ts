@@ -16,12 +16,14 @@ import { v4 as uuidv4 } from 'uuid';
 import FilterableDbService from '../../services/filterable-db.service.abstract';
 import TranslationService from './translation.service';
 import { Language } from '../../enums/languages.enum';
+import User from '../users/user.interface';
+import UserService from '../users/user.service';
 
 @Service()
 export default class TaskService extends FilterableDbService<Task> {
 
 
-    constructor(private translateService: TranslationService) {
+    constructor(private translateService: TranslationService, private userService: UserService) {
         super('Tasks', ["id", "title", "description", "tags", "userLogin", "taskLanguage", "taskStatus", "taskDuration"]);
     }
 
@@ -29,12 +31,12 @@ export default class TaskService extends FilterableDbService<Task> {
 
         if (task.taskLanguage != Language.ENG) {
             let result = await this.Translate(task.description, this.translateService.EnumToCode(task.taskLanguage), "en");
-            if (result.successful){
+            if (result.successful) {
                 task.taskLanguage = Language.ENG;
                 task.description = result.translation.TranslatedText;
             }
         }
-        
+
         if (task.id == null) {
             task.id = uuidv4();
         }
@@ -70,7 +72,7 @@ export default class TaskService extends FilterableDbService<Task> {
 
         let translation: { successful: boolean, translation: any } = await new Promise(async (result) => {
             let request = await this.translateService.Translate(text, from, to);
-            
+
             request
                 .on('error', res => {
                     result({ successful: false, translation: res.message })
@@ -81,5 +83,9 @@ export default class TaskService extends FilterableDbService<Task> {
         });
 
         return translation;
+    }
+
+    public async GetUser(login: string): Promise<User> {
+        return this.userService.GetUser(login)
     }
 }

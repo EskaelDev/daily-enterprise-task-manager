@@ -14,12 +14,14 @@ import { bool } from 'aws-sdk/clients/signer';
 import { v4 as uuidv4 } from 'uuid';
 import FilterableDbService from '../../services/filterable-db.service.abstract';
 import Team from './team.interface';
+import User from '../users/user.interface';
+import UserService from '../users/user.service';
 
 @Service()
 export default class TeamService extends FilterableDbService<Team> {
 
 
-    constructor() {
+    constructor(private userService:UserService) {
         super('Teams', ["teamName", "manager", "department", "members"]);
     }
 
@@ -51,6 +53,10 @@ export default class TeamService extends FilterableDbService<Team> {
             }
             return data;
         });
+    }
+
+    public async GetMember(userName:string):Promise<User>{
+        return this.userService.GetUser(userName);
     }
 
 }

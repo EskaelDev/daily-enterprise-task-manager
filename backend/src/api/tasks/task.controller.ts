@@ -100,6 +100,11 @@ export default class TasksController {
                 let desc = response.body.Items[index].description;
                 desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(user.language));
                 response.body.Items[index].description = desc;
+
+                if (response.body.Items[index].userLogin) {
+                    response.body.Items[index]['User'] = await this.taskService.GetUser(response.body.Items[index].userLogin);
+                    response.body.Items[index]['User'].password = '';
+                }
             }
 
 

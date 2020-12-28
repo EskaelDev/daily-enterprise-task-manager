@@ -9,6 +9,7 @@ import Filter from '../models/filter.model'
 import { ReasonPhrases, StatusCodes, getReasonPhrase, getStatusCode, } from 'http-status-codes';
 import TeamService from "./team.service";
 import Team from "./team.interface";
+import User from "../users/user.interface";
 
 @JsonController("/teams")
 export default class TeamController {
@@ -131,6 +132,17 @@ export default class TeamController {
         });
 
         if (response.successful) {
+
+            for (let index = 0; index < response.body.Items.length; index++) {
+                if (response.body.Items[index].members.length > 0) {
+                    response.body.Items[index]['Members'] = [];
+                    for (let memeber = 0; memeber < response.body.Items[index].members.length; memeber++) {
+                        let user: User = await this.teamService.GetMember(response.body.Items[index].members[memeber]);
+                        user.password='';
+                        response.body.Items[index]['Members'].push(user)
+                    }
+                }
+            }
 
             return res.status(StatusCodes.OK).send(response);
         }
