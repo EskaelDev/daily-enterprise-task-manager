@@ -24,7 +24,7 @@ export default class TaskService extends FilterableDbService<Task> {
 
 
     constructor(private translateService: TranslationService, private userService: UserService) {
-        super('Tasks', ["id", "title", "description", "tags", "userLogin", "taskLanguage", "taskStatus", "taskDuration"]);
+        super('Tasks', ["id", "title", "description", "tags", "userLogin", "teamName", "taskLanguage", "taskStatus", "taskDuration"]);
     }
 
     public async Put(task: Task): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
