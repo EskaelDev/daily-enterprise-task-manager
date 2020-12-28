@@ -44,7 +44,7 @@ export default class TeamService extends FilterableDbService<Team> {
 
         const params = {
             TableName: this.TABLE_NAME,
-            Key: { 'name': key }
+            Key: { 'teamName': key }
         };
 
         return this.docClient.get(params, function (err, data) {

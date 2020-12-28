@@ -94,6 +94,21 @@ export default class TeamController {
         });
 
         if (response.successful) {
+
+            if (response.body.Item.members.length > 0) {
+                response.body.Item['Members'] = [];
+                for (let memeber = 0; memeber < response.body.Item.members.length; memeber++) {
+                    let user: User = await this.teamService.GetMember(response.body.Item.members[memeber]);
+                    user.password = '';
+                    response.body.Item['Members'].push(user)
+                }
+            }
+            if (response.body.Item.manager) {
+                response.body.Item['Manager'] = await this.teamService.GetMember(response.body.Item.manager);
+                response.body.Item['Manager'].password = '';
+            }
+
+
             return res.status(StatusCodes.OK).send(response);
         }
 
@@ -138,9 +153,13 @@ export default class TeamController {
                     response.body.Items[index]['Members'] = [];
                     for (let memeber = 0; memeber < response.body.Items[index].members.length; memeber++) {
                         let user: User = await this.teamService.GetMember(response.body.Items[index].members[memeber]);
-                        user.password='';
+                        user.password = '';
                         response.body.Items[index]['Members'].push(user)
                     }
+                }
+                if (response.body.Items[index].manager) {
+                    response.body.Items[index]['Manager'] = await this.teamService.GetMember(response.body.Items[index].manager);
+                    response.body.Items[index]['Manager'].password = '';
                 }
             }
 
