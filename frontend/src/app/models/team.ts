@@ -8,6 +8,10 @@ export class Team {
     members: string[];
     Members: User[];
 
+    static prepareToUpdate(team: Team) {
+        return new Team({teamName: team.teamName, department: team.department, manager: team.manager, members: team.members});
+    }
+
     constructor(init?:Partial<Team>) {
         Object.assign(this, init);
     }

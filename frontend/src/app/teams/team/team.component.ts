@@ -9,8 +9,9 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Language } from 'src/app/models/language.enum';
 import { TeamsService } from 'src/app/services/teams.service';
 import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { map, takeLast } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { AlertService } from 'src/app/services/alert.service';
 
 @Component({
   selector: 'app-team',
@@ -26,13 +27,11 @@ export class TeamComponent implements OnInit {
     wasNotifyClicked = false;
     
     currentTaskForm: FormGroup;
-    teamNameForm: FormGroup;
     teamDepartmentForm: FormGroup;
     teamLanguageControl: FormControl;
 
     tmpTags = [];
     submitted = false;
-    loadingName = false;
     loadingDepartment = false;
     isLoading = true;
 
@@ -45,7 +44,7 @@ export class TeamComponent implements OnInit {
 
     constructor(private authService: AuthService, private tasksService: TasksService, 
         private teamsService: TeamsService, private fb: FormBuilder, private route: ActivatedRoute,
-        private cdRef: ChangeDetectorRef) { }
+        private cdRef: ChangeDetectorRef, private alertService: AlertService) { }
 
     ngAfterViewChecked() {
         this.cdRef.detectChanges();
@@ -55,36 +54,56 @@ export class TeamComponent implements OnInit {
         const manager = this.authService.currentUserValue;
 
         this.route.params.pipe(map(p => p.teamName)).subscribe(teamName => {
-                this.teamsService.loadAll(manager.login);
-                this.team = this.teamsService.getTeam(teamName);
+                this.teamsService.load(teamName);
+                this.teamsService.teams.subscribe(teams => {
+                    this.team = teams.find(t => t.teamName === teamName);
 
-                this.tasksService.tasksByMembers.subscribe(tasksByMembers =>
+                    if (this.team && !this.loadingDepartment)
                     {
-                        this.tasksByMembers = tasksByMembers;
-                        this.team.Members.forEach(member => 
+                        this.tasksService.tasksByMembers.subscribe(tasksByMembers =>
                             {
-                                if (!this.tasksByMembers.has(member.login))
-                                    this.tasksByMembers.set(member.login, []);
-                            });
-                        this.isLoading = false;
+                                this.tasksByMembers = tasksByMembers;
+                                this.team.Members.forEach(member => 
+                                    {
+                                        if (!this.tasksByMembers.has(member.login))
+                                            this.tasksByMembers.set(member.login, []);
+                                    });
+                                this.isLoading = false;
+                            }
+                        );
+                        this.isLoading = true;
+                        this.tasksService.loadAll(this.team.teamName);
+
+                        this.teamLanguageControl = new FormControl(manager.language);
+        
+                        this.teamLanguageControl.valueChanges.subscribe((language: any) => {
+                            this.onLanguageChange(language);
+                        });
+                
+                        this.teamDepartmentForm = this.fb.group({
+                            departmentName: [this.team.department, Validators.required]
+                        });
                     }
-                );
-                this.isLoading = true;
-                this.tasksService.loadAll(this.team.teamName, manager.language);
-        
-                this.teamLanguageControl = new FormControl(manager.language);
-        
-                this.teamLanguageControl.valueChanges.subscribe((language: any) => {
-                    this.onLanguageChange(language);
+
+                    if (this.loadingDepartment){
+                        this.loadingDepartment = false;
+                    }
                 });
-        
-                this.teamNameForm = this.fb.group({
-                    teamName: [this.team.teamName, Validators.required]
-                });
-        
-                this.teamDepartmentForm = this.fb.group({
-                    departmentName: [this.team.department, Validators.required]
-                });
+
+                this.teamsService.error.subscribe(error => {
+                    if (error !== "") {
+                      this.alertService.error(error);
+                      this.isLoading = false;
+                      this.loadingDepartment = false;
+                    }
+                  });
+
+                this.tasksService.error.subscribe(error => {
+                    if (error !== "") {
+                      this.alertService.error(error);
+                      this.isLoading = false;
+                    }
+                  });
         });
     }
 
@@ -102,7 +121,7 @@ export class TeamComponent implements OnInit {
 
         this.currentTaskForm = this.fb.group({
             title: [task.title ? task.title : '', Validators.required],
-            description: [task.description ? task.description : ''], 
+            description: [task.description ? task.description.translation ? task.description.translation : task.description : ''], 
             user: [task.userLogin ? task.userLogin : 'unassigned'],
             taskDuration: [task.taskDuration ? task.taskDuration : ''],
             taskStatus: [task.taskStatus]
@@ -180,25 +199,21 @@ export class TeamComponent implements OnInit {
 
     onLanguageChange(language: Language)
     {
-        this.tasksService.loadAll(this.team.teamName, language); // TODO
-    }
-
-    onTeamNameChange()
-    {
-        // TODO
-        this.loadingName = true;
-        console.log(`Change team name to: ${this.teamNameForm.get('teamName').value}`);
-        this.loadingName = false;
-        // this.teamService.changeName(this.team.name, name);
+        this.tasksService.loadAll(this.team.teamName); // TODO
     }
 
     onTeamDepartmentChange()
     {
-        // TODO
-        this.loadingDepartment = true;
-        console.log(`Change team department to: ${this.teamDepartmentForm.get('departmentName').value}`);
-        this.loadingDepartment = false;
-        // this.teamService.changeDepartment(this.team.department, name);
+        if (this.teamDepartmentForm.get('departmentName').valid)
+        {
+            this.loadingDepartment = true;
+            this.team.department = this.teamDepartmentForm.get('departmentName').value;
+            this.teamsService.update(this.team);
+        }
+        else {
+            this.alertService.error("Department name can not be empty!");
+            this.teamDepartmentForm.setValue({departmentName: this.team.department});
+        }
     }
 
     onNotifyClicked()
@@ -215,7 +230,7 @@ export class TeamComponent implements OnInit {
                 event.previousIndex,
                 event.currentIndex);
             let task = event.container.data[event.currentIndex];
-            task.userLogin = event.container.id;
+            task.userLogin = event.container.id === "unassigned" ? null : event.container.id;
             this.tasksService.update(task);
         }
     }

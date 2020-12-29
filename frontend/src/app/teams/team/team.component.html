@@ -1,11 +1,6 @@
 <div *ngIf="!isLoading" class="search">
     <div class="team-des ml-2 mb-2">
-        <form [formGroup]="teamNameForm" (focusout)="onTeamNameChange()">
-            <div class="input-group loading">
-                <input class="form-control form-control-sm team-desc team-name" id="team-name" type="text" formControlName="teamName">
-                <span *ngIf="loadingName" class="spinner-border spinner-border-sm ml-2"></span>
-            </div>
-        </form>
+        <span *ngIf="team" class="ml-2">{{team.teamName}}</span>
         <form [formGroup]="teamDepartmentForm" (focusout)="onTeamDepartmentChange()">
             <div class="input-group loading">
                 <input class="form-control form-control-sm team-desc" id="team-dep" type="text" formControlName="departmentName">
@@ -35,7 +30,7 @@
                         <div class="custom-placeholder" *cdkDragPlaceholder></div>
                         <div class="actions ml-2 mt-2 mr-2">
                             <span class="card-title">{{ task.title }}</span>
-                            <div>
+                            <div class="d-flex">
                                 <fa-icon role="button" class="fa-sm mr-2" style="color: rgba(148, 26, 37, 1);" [icon]="faTrash" (click)="onTrashClicked()"></fa-icon>
                                 <fa-icon role="button" class="fa-sm" style="color: rgba(255, 193, 7, 1);" [icon]="faBell" (click)="onNotifyClicked()"></fa-icon>
                             </div>
@@ -61,7 +56,7 @@
                         <div class="custom-placeholder" *cdkDragPlaceholder></div>
                         <div class="actions ml-2 mt-2 mr-2">
                             <span class="card-title">{{ task.title }}</span>
-                            <div>
+                            <div class="d-flex">
                                 <fa-icon class="fa-sm mr-2" style="color: rgba(148, 26, 37, 1);" [icon]="faTrash" (click)="onTrashClicked()"></fa-icon>
                                 <fa-icon role="button" class="fa-sm" style="color: rgba(255, 193, 7, 1);" [icon]="faBell" (click)="onNotifyClicked()"></fa-icon>
                             </div>

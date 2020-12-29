@@ -12,6 +12,8 @@ export class TeamsService {
   private _teams = new BehaviorSubject<Team[]>([]);
   private dataStore: { teams: Team[] } = { teams: [] };
   readonly teams = this._teams.asObservable();
+  private _error = new BehaviorSubject<string>("");
+  readonly error = this._error.asObservable();
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
@@ -20,12 +22,13 @@ export class TeamsService {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
-    })
+    });
     
-    this.http.post<any>(`${environment.apiUrl}/teams/filter`, {field: "manager", value: managerLogin ? managerLogin : "admin"}, { headers: headers}).subscribe(data => {
-      this.dataStore.teams = data.body.Items;
-      this._teams.next(Object.assign({}, this.dataStore).teams);
-    }, error => console.log(error));
+    this.http.post<any>(`${environment.apiUrl}/teams/filter`, {field: "manager", value: managerLogin ? managerLogin : "admin"}, {headers: headers}).subscribe(
+      data => {
+        this.dataStore.teams = data.body.Items;
+        this._teams.next(Object.assign({}, this.dataStore).teams);
+    }, () => this._error.next("Cannot load teams"));
   }
 
   load(name: string) {
@@ -33,10 +36,11 @@ export class TeamsService {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
-    })
-    this.http.post<any>(`${environment.apiUrl}/teams/filter`, {field: "teamName", value: name}, { headers: headers}).subscribe(data => {
+    });
+
+    this.http.get<any>(`${environment.apiUrl}/teams/${name}`, { headers: headers}).subscribe(data => {
       let notFound = true;
-      let team = data.body.Items[0];
+      let team: Team = data.body.Item;
 
       this.dataStore.teams.forEach((item, index) => {
         if (item.teamName === team.teamName) {
@@ -46,11 +50,11 @@ export class TeamsService {
       });
 
       if (notFound) {
-        this.dataStore.teams.push(data);
+        this.dataStore.teams.push(team);
       }
 
       this._teams.next(Object.assign({}, this.dataStore).teams);
-    }, error => console.log('Could not load team.'));
+    }, () => this._error.next('Could not load team.'));
   }
 
   create(team: Team) {
@@ -63,17 +67,17 @@ export class TeamsService {
   }
 
   update(team: Team) {
-    // this.http.put<Team>(`${environment.apiUrl}/teams/${team.id}`, JSON.stringify(team)).subscribe(data => {
-    //   this.dataStore.teams.forEach((t, i) => {
-    //     if (t.name === data.name) { this.dataStore.teams[i] = data; }
-    //   });
-
-    //   this._teams.next(Object.assign({}, this.dataStore).teams);
-    // }, error => console.log('Could not update team.'));
-    this.dataStore.teams.forEach((t, i) => {
-      if (t.teamName === team.teamName) { this.dataStore.teams[i] = team; }
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     });
-    this._teams.next(Object.assign({}, this.dataStore).teams);
+
+    let teamToUpdate = Team.prepareToUpdate(team);
+    console.log(JSON.stringify(teamToUpdate));
+    this.http.post<Team>(`${environment.apiUrl}/teams/`, JSON.stringify(teamToUpdate), {headers: headers}).subscribe(() => {
+      this.load(team.teamName);
+    }, () => this._error.next('Could not update team.'));
   }
 
   getTeamsOf(managerLogin: string) {
