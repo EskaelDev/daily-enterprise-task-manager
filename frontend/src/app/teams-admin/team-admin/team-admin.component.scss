@@ -1,3 +1,21 @@
 .form-box {
     justify-content: space-between;
 }
+
+.form-control[readonly] {
+    opacity: 0.6 !important;
+}
+
+.badge {
+    padding: 0.5em 0.7em !important;
+    color: rgb(209, 205, 199) !important;
+
+    .close {
+      padding-right: 5px;
+      padding-left: 5px;
+      margin-right: -5px;
+      font-size: inherit;
+      color: inherit;
+      text-shadow: none;
+    }
+}

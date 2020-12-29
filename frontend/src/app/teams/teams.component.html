@@ -1,7 +1,9 @@
 <ul *ngIf="!isLoading" class="list-group m-3">
-    <a class="list-group-item list-group-item-action mt-1" *ngFor="let team of teams" [routerLink]="['/teams', team.teamName]">
-        <span>{{ team.teamName }}</span>
-    </a>
+    <cdk-virtual-scroll-viewport *ngIf="teams" [itemSize]="teams.length" class="teams-list">
+        <a class="list-group-item list-group-item-action mt-1" *cdkVirtualFor="let team of teams" [routerLink]="['/teams', team.teamName]">
+            <span>{{ team.teamName }}</span>
+        </a>
+    </cdk-virtual-scroll-viewport>
 </ul>
 <div *ngIf="isLoading" class="d-flex justify-content-center" style="margin-top: 10%;">
     <div class="spinner-grow text-dark" style="width: 5rem; height: 5rem;" role="status">

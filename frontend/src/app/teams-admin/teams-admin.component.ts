@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Team } from '../models/team';
+import { AlertService } from '../services/alert.service';
 import { TeamsService } from '../services/teams.service';
 
 @Component({
@@ -10,11 +11,24 @@ import { TeamsService } from '../services/teams.service';
 export class TeamsAdminComponent implements OnInit {
 
   teams: Team[];
+  isLoading = true;
 
-  constructor(private teamsService: TeamsService) { }
+  constructor(private teamsService: TeamsService, private alertService: AlertService) { }
 
   ngOnInit(): void {
-    this.teamsService.teams.subscribe(teams => this.teams = teams);
+    this.teamsService.teams.subscribe(
+      teams => {
+        this.teams = teams;
+        this.isLoading =  false;
+      }
+    );
+    this.teamsService.error.subscribe(error => {
+      if (error !== "") {
+        this.alertService.error(error);
+        this.isLoading = false;
+      }
+    });
+    this.isLoading = true;
     this.teamsService.loadAll();
   }
 

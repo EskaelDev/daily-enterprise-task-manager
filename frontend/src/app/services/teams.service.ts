@@ -24,7 +24,7 @@ export class TeamsService {
       'Authorization': `Bearer ${token}`
     });
     
-    this.http.post<any>(`${environment.apiUrl}/teams/filter`, {field: "manager", value: managerLogin ? managerLogin : "admin"}, {headers: headers}).subscribe(
+    this.http.post<any>(`${environment.apiUrl}/teams/filter`, {field: "manager", value: managerLogin ? managerLogin : "druciak"}, {headers: headers}).subscribe(
       data => {
         this.dataStore.teams = data.body.Items;
         this._teams.next(Object.assign({}, this.dataStore).teams);
