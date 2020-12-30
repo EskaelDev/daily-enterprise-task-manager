@@ -1,5 +1,5 @@
 // import * as express from 'express';
-import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode, BodyParam, UseBefore, HeaderParam, BadRequestError, UnauthorizedError, Res } from "routing-controllers";
+import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode, BodyParam, UseBefore, HeaderParam, BadRequestError, UnauthorizedError, Res, Delete, NotFoundError } from "routing-controllers";
 import { Response } from 'express'
 import ApiResponse from "../../utils/api-response";
 import { AuthMiddleware } from "../../middleware/auth.middleware";
@@ -11,6 +11,7 @@ import jwt_decode from "jwt-decode";
 import { ReasonPhrases, StatusCodes, getReasonPhrase, getStatusCode, } from 'http-status-codes';
 import User from "../users/user.interface";
 import TranslationService from "./translation.service";
+import { Language } from "../../enums/languages.enum";
 @JsonController("/tasks")
 export default class TasksController {
 
@@ -37,7 +38,7 @@ export default class TasksController {
                     let response: ApiResponse = {
                         successful: false,
                         caller: {
-                            class: 'TablesController',
+                            class: 'TaskController',
                             method: 'AddTask'
                         },
                         body: res.message
@@ -48,7 +49,7 @@ export default class TasksController {
                     let response: ApiResponse = {
                         successful: true,
                         caller: {
-                            class: 'TablesController',
+                            class: 'TaskController',
                             method: 'AddTask'
                         },
                         body: res.data
@@ -98,8 +99,8 @@ export default class TasksController {
             let user: User = this.authService.ExtractUserFromToken(jwt_decode(token));
             for (let index = 0; index < response.body.Items.length; index++) {
                 let desc = response.body.Items[index].description;
-                desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(user.language));
-                response.body.Items[index].description = desc;
+                desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(filter.language));
+                response.body.Items[index].description = desc.translation.TranslatedText;
 
                 if (response.body.Items[index].userLogin) {
                     response.body.Items[index]['User'] = await this.taskService.GetUser(response.body.Items[index].userLogin);
@@ -117,8 +118,8 @@ export default class TasksController {
 
 
     @UseBefore(AuthMiddleware)
-    @Get('/:taskId')
-    public async GetById(@Res() res: Response, @Param('taskId') taskId: string, @HeaderParam("Authorization") token: string) {
+    @Get('/:taskId/:lang')
+    public async GetById(@Res() res: Response, @Param('taskId') taskId: string, @Param('taskId') lang: Language, @HeaderParam("Authorization") token: string) {
         let response: ApiResponse = await new Promise(async (result) => {
             let request = await this.taskService.GetByKey(taskId);
             request
@@ -148,11 +149,57 @@ export default class TasksController {
 
         if (response.successful) {
             let user: User = this.authService.ExtractUserFromToken(jwt_decode(token));
-            response.body.Item.description = await this.taskService.Translate(response.body.Item.description, 'en', this.translationService.EnumToCode(user.language));
+            let desc = response.body.Item.description;
+            desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(lang));
+            response.body.Item.description = desc.translation.TranslatedText;
             return res.status(StatusCodes.OK).send(response);
         }
 
         throw new BadRequestError(response.body);
+
+    }
+
+
+    @UseBefore(AuthMiddleware)
+    @Delete('/:id')
+    public async DeleteTask(@Param('id') id: string, @Res() res: Response, @HeaderParam("Authorization") token: string) {
+        if (this.authService.NotAdmin(token) && this.authService.NotManager(token)) {
+
+            throw new UnauthorizedError();
+        }
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.taskService.Delete('id', id);
+
+            request
+                .on('error', res => {
+                    let response: ApiResponse = {
+                        successful: false,
+                        caller: {
+                            class: 'TaskController',
+                            method: 'DeleteTask'
+                        },
+                        body: res.message
+                    }
+                    result(response)
+                })
+                .on('success', res => {
+                    let response: ApiResponse = {
+                        successful: true,
+                        caller: {
+                            class: 'TaskController',
+                            method: 'DeleteTask'
+                        },
+                        body: res.data
+                    }
+                    result(response)
+                });
+        });
+
+        if (response.successful) {
+            return res.status(StatusCodes.OK).send(response);
+        }
+        throw new NotFoundError(response.body);
 
     }
 }

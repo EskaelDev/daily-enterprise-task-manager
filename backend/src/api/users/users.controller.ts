@@ -1,5 +1,5 @@
 // import * as express from 'express';
-import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode, BodyParam, UseBefore, HeaderParam, UnauthorizedError, Res, BadRequestError } from "routing-controllers";
+import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode, BodyParam, UseBefore, HeaderParam, UnauthorizedError, Res, BadRequestError, Delete, NotFoundError } from "routing-controllers";
 import User, { Role } from './user.interface'
 import UserService from "./user.service";
 import { Response } from 'express'
@@ -10,6 +10,7 @@ import jwt_decode from "jwt-decode";
 import { HttpResponse } from "aws-sdk";
 import { StatusCodes } from "http-status-codes";
 import { STATUS_CODES } from "http";
+import Filter from '../models/filter.model'
 
 @JsonController("/users")
 export default class UsersController {
@@ -39,8 +40,8 @@ export default class UsersController {
             let response: ApiResponse = {
                 successful: true,
                 caller: {
-                    class: 'TablesController',
-                    method: 'createUsers'
+                    class: 'UsersController',
+                    method: 'GetById'
                 },
                 body: request,
             }
@@ -72,8 +73,8 @@ export default class UsersController {
                     let response: ApiResponse = {
                         successful: false,
                         caller: {
-                            class: 'TablesController',
-                            method: 'createUsers'
+                            class: 'UsersController',
+                            method: 'AddUser'
                         },
                         body: res.message,
                     }
@@ -83,8 +84,8 @@ export default class UsersController {
                     let response: ApiResponse = {
                         successful: true,
                         caller: {
-                            class: 'TablesController',
-                            method: 'createUsers'
+                            class: 'UsersController',
+                            method: 'AddUser'
                         },
                         body: res.data
                     }
@@ -124,8 +125,8 @@ export default class UsersController {
                     let response: ApiResponse = {
                         successful: false,
                         caller: {
-                            class: 'TablesController',
-                            method: 'createUsers'
+                            class: 'UsersController',
+                            method: 'AddAdmin'
                         },
                         body: res.message,
                     }
@@ -135,8 +136,8 @@ export default class UsersController {
                     let response: ApiResponse = {
                         successful: true,
                         caller: {
-                            class: 'TablesController',
-                            method: 'createUsers'
+                            class: 'UsersController',
+                            method: 'AddAdmin'
                         },
                         body: res.data
                     }
@@ -151,6 +152,88 @@ export default class UsersController {
 
         throw new BadRequestError(response.body);
 
+    }
+
+
+    @UseBefore(AuthMiddleware)
+    @Delete('/:id')
+    public async DeleteTask(@Param('taskId') id: string, @Res() res: Response, @HeaderParam("Authorization") token: string) {
+        if (this.authService.NotAdmin(token)) {
+
+            throw new UnauthorizedError();
+        }
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.Delete('id', id);
+
+            request
+                .on('error', res => {
+                    let response: ApiResponse = {
+                        successful: false,
+                        caller: {
+                            class: 'UserController',
+                            method: 'DeleteUser'
+                        },
+                        body: res.message
+                    }
+                    result(response)
+                })
+                .on('success', res => {
+                    let response: ApiResponse = {
+                        successful: true,
+                        caller: {
+                            class: 'UserController',
+                            method: 'DeleteUser'
+                        },
+                        body: res.data
+                    }
+                    result(response)
+                });
+        });
+
+        if (response.successful) {
+            return res.status(StatusCodes.OK).send(response);
+        }
+        throw new NotFoundError(response.body);
+
+    }
+
+
+    @UseBefore(AuthMiddleware)
+    @Post('/filter')
+    public async Filter(@Res() res: Response, @Body({ required: true }) filter: Filter, @HeaderParam("Authorization") token: string) {
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.Filter(filter);
+            request
+                .on('error', res => {
+                    let response: ApiResponse = {
+                        successful: false,
+                        caller: {
+                            class: 'UsersController',
+                            method: 'Filter'
+                        },
+                        body: res.message
+                    }
+                    result(response)
+                })
+                .on('success', res => {
+                    let response: ApiResponse = {
+                        successful: true,
+                        caller: {
+                            class: 'UsersController',
+                            method: 'Filter'
+                        },
+                        body: res.data
+                    }
+                    result(response)
+                });
+        });
+
+        if (response.successful) {
+            return res.status(StatusCodes.OK).send(response);
+        }
+
+        throw new NotFoundError(response.body);
     }
 
 }
