@@ -19,7 +19,7 @@ export default class UserService extends FilterableDbService<User> {
 
 
     constructor() {
-        super('Users', ["login", "role", "firstName", "surname", "language"]);
+        super('Users', ["login", "userRole", "firstName", "surname", "userLanguage"]);
 
     }
     public async Put(user: User): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {

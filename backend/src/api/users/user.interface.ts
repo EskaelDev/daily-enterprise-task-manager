@@ -4,10 +4,10 @@ import { Language } from "../../enums/languages.enum";
 export default interface User {
     login: string;
     password: string;
-    role?: Role;
+    userRole?: Role;
     firstName?: string;
     surname?: string;
-    language: Language;
+    userLanguage: Language;
 }
 export enum Role {
     Admin,

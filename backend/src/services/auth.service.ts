@@ -35,8 +35,8 @@ export default class AuthService {
         return {
             login: decodedToken.login,
             password: decodedToken.password,
-            role: decodedToken.role,
-            language: decodedToken.language,
+            userRole: decodedToken.role,
+            userLanguage: decodedToken.language,
             firstName: decodedToken.name,
             surname: decodedToken.surname
         }
@@ -44,30 +44,30 @@ export default class AuthService {
 
     public IsAdmin(token: string) {
         let user: User = this.ExtractUserFromToken(jwt_decode(token));
-        return user.role == Role.Admin
+        return user.userRole == Role.Admin
     }
     public NotAdmin(token: string) {
         let user: User = this.ExtractUserFromToken(jwt_decode(token));
-        return user.role != Role.Admin
+        return user.userRole != Role.Admin
     }
 
 
     public IsManager(token: string) {
         let user: User = this.ExtractUserFromToken(jwt_decode(token));
-        return user.role == Role.Manager
+        return user.userRole == Role.Manager
     }
 
     public NotManager(token: string) {
         let user: User = this.ExtractUserFromToken(jwt_decode(token));
-        return user.role != Role.Manager
+        return user.userRole != Role.Manager
     }
 
     public IsWorker(token: string) {
         let user: User = this.ExtractUserFromToken(jwt_decode(token));
-        return user.role == Role.Worker
+        return user.userRole == Role.Worker
     }
     public NotWorker(token: string) {
         let user: User = this.ExtractUserFromToken(jwt_decode(token));
-        return user.role != Role.Worker
+        return user.userRole != Role.Worker
     }
 }
