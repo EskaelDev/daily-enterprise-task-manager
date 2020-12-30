@@ -1,6 +1,9 @@
+<div class="search mr-3">
+    <input class="form-control form-control-sm dark-border search-input" id="searchInput" type="search" placeholder="Search.." [(ngModel)]="searchText">
+</div>
 <ul *ngIf="!isLoading" class="list-group m-3">
     <cdk-virtual-scroll-viewport *ngIf="teams" [itemSize]="teams.length" class="teams-list">
-        <a class="list-group-item list-group-item-action mt-1" *cdkVirtualFor="let team of teams" [routerLink]="['/teams', team.teamName]">
+        <a class="list-group-item list-group-item-action mt-1" *cdkVirtualFor="let team of teams |filter:searchText" [routerLink]="['/teams', team.teamName]">
             <span>{{ team.teamName }}</span>
         </a>
     </cdk-virtual-scroll-viewport>

@@ -9,7 +9,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Language } from 'src/app/models/language.enum';
 import { TeamsService } from 'src/app/services/teams.service';
 import { ActivatedRoute } from '@angular/router';
-import { map, takeLast } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { AlertService } from 'src/app/services/alert.service';
 
@@ -34,6 +34,7 @@ export class TeamComponent implements OnInit {
     submitted = false;
     loadingDepartment = false;
     isLoading = true;
+    searchText;
 
     @ViewChild('modalCloseButton') modalCloseButton;
 
@@ -206,9 +207,13 @@ export class TeamComponent implements OnInit {
     {
         if (this.teamDepartmentForm.get('departmentName').valid)
         {
-            this.loadingDepartment = true;
-            this.team.department = this.teamDepartmentForm.get('departmentName').value;
-            this.teamsService.update(this.team);
+            let val = this.teamDepartmentForm.get('departmentName').value;
+            if (val !== this.team.department)
+            {
+                this.loadingDepartment = true;
+                this.team.department = val;
+                this.teamsService.update(this.team);
+            }
         }
         else {
             this.alertService.error("Department name can not be empty!");

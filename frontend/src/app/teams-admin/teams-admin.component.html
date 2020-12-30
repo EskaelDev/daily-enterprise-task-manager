@@ -1,10 +1,10 @@
 <div class="search mr-3">
     <button type="button" class="btn btn-outline-info btn-sm mr-2" [routerLink]="['/teams-admin/new']">Add team</button>
-    <input class="form-control form-control-sm dark-border search-input" id="searchInput" type="search" placeholder="Search..">
+    <input class="form-control form-control-sm dark-border search-input" id="searchInput" type="search" placeholder="Search.." [(ngModel)]="searchText">
 </div>
 <ul *ngIf="!isLoading" class="list-group m-3">
     <cdk-virtual-scroll-viewport *ngIf="teams" [itemSize]="teams.length" class="teams-list">
-        <a class="list-group-item list-group-item-action mt-1" *cdkVirtualFor="let team of teams" [routerLink]="['/teams-admin', team.teamName]">
+        <a class="list-group-item list-group-item-action mt-1" *cdkVirtualFor="let team of teams |filter:searchText" [routerLink]="['/teams-admin', team.teamName]">
             <span>{{ team.teamName }}</span>
         </a>
     </cdk-virtual-scroll-viewport>

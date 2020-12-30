@@ -5,3 +5,14 @@ span, p {
 .teams-list {
     height: 71vh;
 }
+
+.search {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    align-content: flex-end;
+}
+
+.search-input {
+    width: 20%;
+}

@@ -12,6 +12,7 @@ import { TeamsService } from '../services/teams.service';
 export class TeamsComponent implements OnInit {
   teams: Team[];
   isLoading = true;
+  searchText;
 
   constructor(private authService: AuthService, private teamsService: TeamsService, private alertService: AlertService) { }
 

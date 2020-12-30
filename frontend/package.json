@@ -28,6 +28,7 @@
     "bootstrap": "^4.5.3",
     "jquery": "^3.5.1",
     "jwt-decode": "^3.1.2",
+    "ng2-search-filter": "^0.5.1",
     "ngx-chips": "^2.2.2",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",

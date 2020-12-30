@@ -12,6 +12,7 @@ export class TeamsAdminComponent implements OnInit {
 
   teams: Team[];
   isLoading = true;
+  searchText;
 
   constructor(private teamsService: TeamsService, private alertService: AlertService) { }
 
