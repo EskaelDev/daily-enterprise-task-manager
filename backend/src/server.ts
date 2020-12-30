@@ -3,7 +3,8 @@ import App from './app';
 import UsersController from './api/users/users.controller'
 import dotenv from 'dotenv'
 import Container from 'typedi';
-import { useContainer } from 'routing-controllers';
+import { getMetadataArgsStorage, useContainer } from 'routing-controllers';
+import { routingControllersToSpec } from 'routing-controllers-openapi';
 
 dotenv.config();
 const port = process.env.PORT || 5000;

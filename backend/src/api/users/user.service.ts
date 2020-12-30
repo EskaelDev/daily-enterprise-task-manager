@@ -12,13 +12,14 @@ import jwt from 'jsonwebtoken'
 import { ErrorCause } from 'aws-sdk/clients/qldb';
 import crypto from 'crypto'
 import { bool } from 'aws-sdk/clients/signer';
+import FilterableDbService from '../../services/filterable-db.service.abstract';
 
 @Service()
-export default class UserService extends DbService<User> {
+export default class UserService extends FilterableDbService<User> {
 
 
     constructor() {
-        super('Users');
+        super('Users', ["login", "role", "firstName", "surname", "language"]);
 
     }
     public async Put(user: User): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
@@ -43,36 +44,6 @@ export default class UserService extends DbService<User> {
             return data;
         });
     }
-
-    /** Do not use! // ~! Do not use! */
-    // public Update(user: User): AWS.Request<DynamoDB.DocumentClient.UpdateItemOutput, AWS.AWSError> {
-    //     throw new Error("not implemented");
-
-
-    //     // TODO: asure UpdateExpression and ExpressionAttributeValues match all User properties
-    //     let model: DynamoUpdateModel = {
-    //         TableName: this.TABLE_NAME,
-    //         Key: {
-    //             'login': user.login
-    //         },
-    //         UpdateExpression: `set info.rating = :r, info.plot=:p, info.actors=:a`,
-    //         ExpressionAttributeValues: {
-    //             ":r": 5.5,
-    //             ":p": "Everything happens all at once.",
-    //             ":a": ["Larry", "Moe", "Curly"]
-    //         },
-    //         ReturnValues: "UPDATED_NEW"
-    //     }
-
-    //     return this.docClient.update(model, function (err, data) {
-    //         if (err) {
-    //             return err;
-    //         }
-    //         return data;
-    //     });
-    // }
-
-
 
     public GetByKey(key: string): AWS.Request<DynamoDB.DocumentClient.GetItemOutput, AWS.AWSError> {
 
