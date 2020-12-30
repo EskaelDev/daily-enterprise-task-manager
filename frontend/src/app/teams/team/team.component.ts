@@ -75,7 +75,7 @@ export class TeamComponent implements OnInit {
                         this.isLoading = true;
                         this.tasksService.loadAll(this.team.teamName);
 
-                        this.teamLanguageControl = new FormControl(manager.language);
+                        this.teamLanguageControl = new FormControl(manager.userLanguage);
         
                         this.teamLanguageControl.valueChanges.subscribe((language: any) => {
                             this.onLanguageChange(language);

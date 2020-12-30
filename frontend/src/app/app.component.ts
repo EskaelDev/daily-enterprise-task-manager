@@ -25,11 +25,11 @@ export class AppComponent implements OnInit {
     }
     
     get isAdmin() {
-        return this.currentUser && Number(this.currentUser.role) === Role.Admin;
+        return this.currentUser && Number(this.currentUser.userRole) === Role.Admin;
     }
 
     get isManager() {
-        return this.currentUser && Number(this.currentUser.role) === Role.Manager;
+        return this.currentUser && Number(this.currentUser.userRole) === Role.Manager;
     }
 
     logout() {

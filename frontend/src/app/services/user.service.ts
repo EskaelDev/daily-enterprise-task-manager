@@ -1,7 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { IUser } from '../models/iuser';
+import { Role } from '../models/role.enum';
+import { User } from '../models/user';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,8 +12,13 @@ import { IUser } from '../models/iuser';
 export class UserService {
   constructor(private http: HttpClient) { }
 
-  getAll() {
-      return this.http.get<IUser[]>(`${environment.apiUrl}/users`);
+  getAll(currUserToken: string, userRole: Role) {
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${currUserToken}`
+      });
+
+      return this.http.post<any>(`${environment.apiUrl}/users/filter`, {field: "userRole", value: `${userRole}`}, {headers: headers});
   }
 
   getUser(login: string, password: string) {

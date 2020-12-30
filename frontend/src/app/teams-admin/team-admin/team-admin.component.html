@@ -17,7 +17,7 @@
                     <input type="search" class="form-control form-control-sm dark-border" style="max-width: 400px;" placeholder="Search..">
                     <div *ngIf="team && team.Manager" class="col">
                         <span class="badge badge-info">
-                            {{ team.Manager.surname }} {{ team.Manager.name }}
+                            {{ team.Manager.surname }} {{ team.Manager.userName }}
                             <button type="button" class="close" aria-label="Dismiss" (click)="onDeleteManagerClicked()">
                             <span aria-hidden="true">&times;</span>
                             </button>
@@ -47,7 +47,7 @@
                 <tbody *ngIf="team">
                     <tr *ngFor="let member of team.Members; let i = index;">
                         <td>{{ member.surname }}</td>
-                        <td>{{ member.name }}</td>
+                        <td>{{ member.userName }}</td>
                         <td>{{ member.login }}</td>
                         <td style="text-align: center;"><fa-icon type="button" class="fa mr-2" style="color: rgba(148, 26, 37, 1);" [icon]="faTimes" (click)="onDeleteMemberClicked(i)"></fa-icon></td>
                     </tr>

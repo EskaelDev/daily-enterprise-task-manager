@@ -6,6 +6,10 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { AlertService } from 'src/app/services/alert.service';
+import { User } from 'src/app/models/user';
+import { UserService } from 'src/app/services/user.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { Role } from 'src/app/models/role.enum';
 
 @Component({
   selector: 'app-team-admin',
@@ -15,6 +19,9 @@ import { AlertService } from 'src/app/services/alert.service';
 export class TeamAdminComponent implements OnInit {
 
     team: Team;
+    managers: User[];
+    workers: User[];
+    
     teamForm: FormGroup;
     isNewTeam = false;
 
@@ -22,7 +29,8 @@ export class TeamAdminComponent implements OnInit {
     faTimes = faTimes;
     
     constructor(private teamsService: TeamsService, private fb: FormBuilder, private route: ActivatedRoute,
-        private alertService: AlertService, private router: Router) { }
+        private alertService: AlertService, private router: Router,
+        private usersService: UserService, private authService: AuthService) { }
 
     ngOnInit(): void {
         this.teamForm = this.fb.group({
@@ -55,7 +63,19 @@ export class TeamAdminComponent implements OnInit {
                     }
                 });
             }
-        }); 
+        });
+        
+        this.usersService.getAll(this.authService.currentUserValue.token, Role.Manager).subscribe(
+            data => { this.managers = data.body.Items},
+            error => { //TODO
+            }
+          );
+        
+        this.usersService.getAll(this.authService.currentUserValue.token, Role.Worker).subscribe(
+            data => { this.workers = data.body.Items},
+            error => { //TODO
+            }
+          );
     }
 
     onDeleteMemberClicked(idx: number)

@@ -23,12 +23,23 @@ export class TeamsService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
-    
-    this.http.post<any>(`${environment.apiUrl}/teams/filter`, {field: "manager", value: managerLogin ? managerLogin : "druciak"}, {headers: headers}).subscribe(
-      data => {
-        this.dataStore.teams = data.body.Items;
-        this._teams.next(Object.assign({}, this.dataStore).teams);
-    }, () => this._error.next("Cannot load teams"));
+
+    managerLogin = "druciak"
+
+    if (managerLogin)
+    {
+      this.http.post<any>(`${environment.apiUrl}/teams/filter`, {field: "manager", value: managerLogin}, {headers: headers}).subscribe(
+        data => {
+          this.dataStore.teams = data.body.Items;
+          this._teams.next(Object.assign({}, this.dataStore).teams);
+      }, () => this._error.next("Cannot load teams"));
+    } else {
+      this.http.get<any>(`${environment.apiUrl}/teams/all`, {headers: headers}).subscribe(
+        data => {
+          this.dataStore.teams = data.body.Items;
+          this._teams.next(Object.assign({}, this.dataStore).teams);
+      }, () => this._error.next("Cannot load teams"));
+    }
   }
 
   load(name: string) {

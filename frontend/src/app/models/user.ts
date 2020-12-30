@@ -5,10 +5,10 @@ import { Role } from './role.enum';
 export class User implements IUser {
     login: string;
     password?: string;
-    role: Role;
-    name: string;
+    userRole: Role;
+    userName: string;
     surname: string;
-    language: Language;
+    userLanguage: Language;
     token: string;
 
     constructor(init?:Partial<User>) {
