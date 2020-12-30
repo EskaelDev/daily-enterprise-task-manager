@@ -5,7 +5,7 @@ export default interface User {
     login: string;
     password: string;
     userRole?: Role;
-    firstName?: string;
+    userName?: string;
     surname?: string;
     userLanguage: Language;
 }

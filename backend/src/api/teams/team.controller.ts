@@ -63,6 +63,63 @@ export default class TeamController {
     }
 
     @UseBefore(AuthMiddleware)
+    @Get('/all')
+    public async GetAll(@Res() res: Response, @HeaderParam("Authorization") token: string) {
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.teamService.GetAll();
+            if (request) {
+                let response: ApiResponse = {
+                    successful: true,
+                    caller: {
+                        class: 'TeamController',
+                        method: 'GetById'
+                    },
+                    body: request
+                }
+                result(response)
+            }
+            else {
+                let response: ApiResponse = {
+                    successful: false,
+                    caller: {
+                        class: 'TeamController',
+                        method: 'GetById'
+                    },
+                    body: "Empty"
+                }
+                result(response)
+            }
+        });
+
+        if (response.successful) {
+            for (let index = 0; index < response.body.length; index++) {
+
+                if (response.body[index].members.length > 0) {
+                    response.body[index]['Members'] = [];
+                    for (let memeber = 0; memeber < response.body[index].members.length; memeber++) {
+                        let user: User = await this.teamService.GetMember(response.body[index].members[memeber]);
+                        if (user)
+                            user.password = '';
+                        response.body[index]['Members'].push(user)
+                    }
+                }
+                if (response.body[index].manager) {
+                    response.body[index]['Manager'] = await this.teamService.GetMember(response.body[index].manager);
+                    response.body[index]['Manager'].password = '';
+                }
+
+            }
+
+
+            return res.status(StatusCodes.OK).send(response);
+        }
+
+        throw new BadRequestError(response.body);
+
+    }
+
+    @UseBefore(AuthMiddleware)
     @Get('/:teamName')
     public async GetById(@Res() res: Response, @Param('teamName') teamName: string, @HeaderParam("Authorization") token: string) {
 
@@ -117,43 +174,6 @@ export default class TeamController {
     }
 
 
-    @UseBefore(AuthMiddleware)
-    @Get('/all')
-    public async GetAll(@Res() res: Response, @HeaderParam("Authorization") token: string) {
-
-        let response: ApiResponse = await new Promise(async (result) => {
-            let request = await this.teamService.GetAll();
-            if (request) {
-                let response: ApiResponse = {
-                    successful: true,
-                    caller: {
-                        class: 'TeamController',
-                        method: 'GetById'
-                    },
-                    body: request
-                }
-                result(response)
-            }
-            else {
-                let response: ApiResponse = {
-                    successful: false,
-                    caller: {
-                        class: 'TeamController',
-                        method: 'GetById'
-                    },
-                    body: "Empty"
-                }
-                result(response)
-            }
-        });
-
-        if (response.successful) {
-            return res.status(StatusCodes.OK).send(response);
-        }
-
-        throw new BadRequestError(response.body);
-
-    }
 
     @UseBefore(AuthMiddleware)
     @Post('/filter')
