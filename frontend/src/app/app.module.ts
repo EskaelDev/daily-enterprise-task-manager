@@ -17,7 +17,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { TeamsAdminComponent } from './teams-admin/teams-admin.component';
 import { TeamAdminComponent } from './teams-admin/team-admin/team-admin.component';
-import {ScrollingModule} from '@angular/cdk/scrolling';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 @NgModule({
   declarations: [
@@ -41,7 +42,8 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
     TagInputModule, 
     BrowserAnimationsModule,
     DragDropModule,
-    ScrollingModule
+    ScrollingModule,
+    Ng2SearchPipeModule
   ],
   providers: [],
   bootstrap: [AppComponent]
