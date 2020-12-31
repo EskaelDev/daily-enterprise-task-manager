@@ -3,6 +3,8 @@ import * as bodyParser from 'body-parser';
 import { useExpressServer, createExpressServer } from "routing-controllers";
 import cors from 'cors';
 import passport from 'passport';
+import { getMetadataArgsStorage } from 'routing-controllers';
+import { routingControllersToSpec } from 'routing-controllers-openapi';
 
 export default class App {
     public app: express.Application;
@@ -11,12 +13,12 @@ export default class App {
     constructor(port: number) {
 
         this.app = createExpressServer({
-            cors:true,
+            cors: true,
             routePrefix: '/api',
             controllers: [__dirname + "/**/*.controller.ts"]
         });
         this.port = port;
-
+        this.PrintOpenApi();
         // this.initializeMiddlewares();
         // this.initializeControllers();
     }
@@ -35,5 +37,12 @@ export default class App {
         this.app.listen(this.port, () => {
             console.log(`Server started at http://localhost:${this.port}`);
         });
+    }
+
+    public PrintOpenApi() {
+
+        const storage = getMetadataArgsStorage()
+        const spec = routingControllersToSpec(storage)
+        console.log(spec)
     }
 }

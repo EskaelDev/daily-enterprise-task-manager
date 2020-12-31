@@ -3,22 +3,22 @@ import { Team } from '../models/team';
 import { AlertService } from '../services/alert.service';
 import { AuthService } from '../services/auth.service';
 import { TeamsService } from '../services/teams.service';
+import { UserService } from '../services/user.service';
 
 @Component({
-  selector: 'app-teams',
-  templateUrl: './teams.component.html',
-  styleUrls: ['./teams.component.scss']
+  selector: 'app-teams-admin',
+  templateUrl: './teams-admin.component.html',
+  styleUrls: ['./teams-admin.component.scss']
 })
-export class TeamsComponent implements OnInit {
+export class TeamsAdminComponent implements OnInit {
+
   teams: Team[];
   isLoading = true;
   searchText;
 
-  constructor(private authService: AuthService, private teamsService: TeamsService, private alertService: AlertService) { }
+  constructor(private teamsService: TeamsService, private alertService: AlertService) { }
 
   ngOnInit(): void {
-    const user = this.authService.currentUserValue;
-
     this.teamsService.teams.subscribe(
       teams => {
         this.teams = teams;
@@ -32,6 +32,11 @@ export class TeamsComponent implements OnInit {
       }
     });
     this.isLoading = true;
-    this.teamsService.loadAll(user.login);
+    this.teamsService.loadAll();
+  }
+
+  addNewTeam()
+  {
+
   }
 }

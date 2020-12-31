@@ -12,7 +12,7 @@
     <div class="form-group">
       <label for="InputPassword">Password</label>
       <input type="password" class="form-control form-control-sm dark-input dark-border" id="InputPassword" formControlName="password"  [ngClass]="{ 'is-invalid': submitted && f.password.errors }">
-      <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
+      <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
         <div *ngIf="f.password.errors.required">Password is required</div>
       </div>
     </div>
@@ -20,9 +20,9 @@
       <input type="checkbox" class="form-check-input" id="Check">
       <label class="form-check-label" for="Check">Remember me</label>
     </div>
-    <button type="submit" class="btn btn-info btn-block btn-sm">
-      <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+    <button type="submit" class="btn btn-info btn-block btn-sm">      
       Let me in
+      <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1 ml-3"></span>
     </button>
   </form>
 </div>

@@ -1,0 +1,62 @@
+<div class="d-flex m-3">
+    <form [formGroup]="teamForm" style="width: 100%;" class="form-box">
+        <div class="row">
+            <div class="col">
+                <label for="teamName">Team name</label>
+                <input type="text" class="form-control form-control-sm dark-border" id="teamName" formControlName="teamName" [readonly]="!isNewTeam">
+            </div>
+            <div class="col">
+                <label for="teamDepartment">Team department</label>
+                <input type="text" class="form-control form-control-sm dark-border" formControlName="department">
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col" >
+                <label for="teamManager">Manager</label>
+                <div class="d-flex align-items-center">
+                    <input type="search" class="form-control form-control-sm dark-border" style="max-width: 400px;" placeholder="Search..">
+                    <div *ngIf="team && team.Manager" class="col">
+                        <span class="badge badge-info">
+                            {{ team.Manager.surname }} {{ team.Manager.userName }}
+                            <button type="button" class="close" aria-label="Dismiss" (click)="onDeleteManagerClicked()">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col" >
+                <label for="teamMembers">Members</label>
+                <div class="d-flex align-items-center">
+                    <input type="search" class="form-control form-control-sm dark-border" style="max-width: 400px;" placeholder="Search..">
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4 m-1 table-responsive-sm">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Surname</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Login</th>
+                        <th scope="col" style="text-align: center;">Delete</th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="team">
+                    <tr *ngFor="let member of team.Members; let i = index;">
+                        <td>{{ member.surname }}</td>
+                        <td>{{ member.userName }}</td>
+                        <td>{{ member.login }}</td>
+                        <td style="text-align: center;"><fa-icon type="button" class="fa mr-2" style="color: rgba(148, 26, 37, 1);" [icon]="faTimes" (click)="onDeleteMemberClicked(i)"></fa-icon></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex" style="justify-content: flex-end;">
+            <button type="button" (click)="onCancelClicked()" class="btn btn-outline-danger btn-sm mr-2" style="align-self: flex-end;">Cancel</button>
+            <button type="submit" class="btn btn-outline-info btn-sm mr-2" style="align-self: flex-end;">Save team</button>
+        </div>
+    </form>
+</div>

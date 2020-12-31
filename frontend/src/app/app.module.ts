@@ -14,6 +14,11 @@ import { TeamComponent } from './teams/team/team.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { TeamsComponent } from './teams/teams.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { TeamsAdminComponent } from './teams-admin/teams-admin.component';
+import { TeamAdminComponent } from './teams-admin/team-admin/team-admin.component';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { Ng2SearchPipeModule } from 'ng2-search-filter';
 
 @NgModule({
   declarations: [
@@ -23,7 +28,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     AlertComponent,
     TeamComponent,
     BreadcrumbComponent,
-    TeamsComponent
+    TeamsComponent,
+    TeamsAdminComponent,
+    TeamAdminComponent
   ],
   imports: [
     BrowserModule,
@@ -34,6 +41,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     FontAwesomeModule,
     TagInputModule, 
     BrowserAnimationsModule,
+    DragDropModule,
+    ScrollingModule,
+    Ng2SearchPipeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

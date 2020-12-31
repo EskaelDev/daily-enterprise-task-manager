@@ -1,7 +1,11 @@
 import AWS, { DynamoDB } from 'aws-sdk';
 import { ServiceConfigurationOptions } from 'aws-sdk/lib/service';
-import { Delete, Get, JsonController } from 'routing-controllers';
+import { StatusCodes } from 'http-status-codes';
+import { BadRequestError, Delete, Get, JsonController, Res } from 'routing-controllers';
+import { Response } from 'express';
 import ApiResponse from '../utils/api-response';
+import TaskSchema from './schemas/task.schema';
+import TeamSchema from './schemas/team.schema';
 import UserSchema from './schemas/user.schema'
 
 @JsonController('/aws')
@@ -22,13 +26,24 @@ export default class TablesController {
 
     }
 
-    @Get('/users')
-    public async createUsers(): Promise<ApiResponse> {
+    @Get('/create')
+    public async createTables(@Res() res: Response) {
 
-        return await new Promise((result: any) => {
-            let request = this.dynamodb.createTable(UserSchema, function (err, data) {
+        let userSchema: boolean = await this.makeTable(UserSchema)
+        let taskSchema: boolean = await this.makeTable(TaskSchema)
+        let teamSchema: boolean = await this.makeTable(TeamSchema)
+
+        if (userSchema && taskSchema && teamSchema)
+            return res.status(StatusCodes.CREATED).send('All tables created');
+
+        throw new BadRequestError();
+    }
+
+    private async makeTable(tableSchema: any): Promise<boolean> {
+        return new Promise((result: any) => {
+            let request = this.dynamodb.createTable(tableSchema, function (err, data) {
                 if (err) {
-                    return err
+                    return err;
                 } else {
                     return data;
                 }
@@ -36,35 +51,33 @@ export default class TablesController {
 
             request
                 .on('error', res => {
-                    let response: ApiResponse = {
-                        statusCode: 400,
-                        caller: {
-                            class: 'TablesController',
-                            method: 'createUsers'
-                        },
-                        body: res.message,
-                    }
-                    result(response)
+                    result(false);
                 })
                 .on('success', res => {
-                    let response: ApiResponse = {
-                        statusCode: 200,
-                        caller: {
-                            class: 'TablesController',
-                            method: 'createUsers'
-                        },
-                        body: res.data
-                    }
-                    result(response)
+                    result(true);
                 });
 
         });
     }
-    @Delete('/users')
-    public async deleteUsers(): Promise<ApiResponse> {
 
+
+    @Delete()
+    public async deleteTables(@Res() response:Response) {
+
+        let users: boolean = await this.DeleteTable('Users');
+        let tasks: boolean = await this.DeleteTable('Tasks');
+        let teams: boolean = await this.DeleteTable('Teams');
+
+        if (users && tasks && teams)
+            return response.status(StatusCodes.OK).send('All tables deleted');
+
+        throw new BadRequestError();
+    }
+
+
+    private async DeleteTable(tableName: string): Promise<boolean> {
         return await new Promise((result: any) => {
-            let request = this.dynamodb.deleteTable({ TableName: "Users" }, function (err, data) {
+            let request = this.dynamodb.deleteTable({ TableName: tableName }, function (err, data) {
                 if (err) {
                     return err
                 } else {
@@ -74,29 +87,13 @@ export default class TablesController {
 
             request
                 .on('error', res => {
-                    let response: ApiResponse = {
-                        statusCode: 400,
-                        caller: {
-                            class: 'TablesController',
-                            method: 'deleteUsers'
-                        },
-                        body: res.message
-                    }
-                    result(response)
+                    result(false)
                 })
                 .on('success', res => {
-                    let response: ApiResponse = {
-                        statusCode: 200,
-                        caller: {
-                            class: 'TablesController',
-                            method: 'deleteUsers'
-                        },
-                        body: res.data
-                    }
-                    result(response)
+                    result(true)
                 });
 
         });
-    }
 
+    }
 }

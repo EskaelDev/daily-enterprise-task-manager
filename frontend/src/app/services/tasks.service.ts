@@ -1,84 +1,101 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Task } from '../models/task';
+import { v4 as uuidv4 } from 'uuid';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TasksService {
-  private _tasks = new BehaviorSubject<Task[]>([]);
-  private dataStore: { tasks: Task[] } = { tasks: [] };
-  readonly tasks = this._tasks.asObservable();
-  private taskId = 10;
+  private _tasksByMembers = new BehaviorSubject<Map<string, Task[]>>(new Map());
+  private dataStore: { tasksByMembers: Map<string, Task[]>} = { tasksByMembers: new Map() };
+  readonly tasksByMembers = this._tasksByMembers.asObservable();
+  private _error = new BehaviorSubject<string>("");
+  readonly error = this._error.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   loadAll(teamName: string) {
-    // this.http.get<Task[]>(`${environment.apiUrl}/tasks`).subscribe(data => {
-    //   this.dataStore.tasks = data;
-    //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
-    // }, error => console.log('Could not load tasks.'));
-    const tasks: Task[] = [
-      new Task({id:1, title: "title1", description: "", userLogin: "druciak", tags: ["tag1", "ta2", "tag5"], teamName: 'team1'}),
-      new Task({id:2, title: "title2", description: "", userLogin: "druciak", tags: ["tag1"], teamName: 'team2'}),
-      new Task({id:3, title: "title", description: "desc", tags: ["tag"], teamName: 'team1'})];
-    this.dataStore.tasks = tasks.filter(task => task.teamName === teamName);
-    this._tasks.next(Object.assign({}, this.dataStore).tasks);
-  }
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
 
-  load(id: number | string) {
-    this.http.get<Task>(`${environment.apiUrl}/tasks/${id}`).subscribe(data => {
-      let notFound = true;
-
-      this.dataStore.tasks.forEach((item, index) => {
-        if (item.id === data.id) {
-          this.dataStore.tasks[index] = data;
-          notFound = false;
-        }
+    this.http.post<any>(`${environment.apiUrl}/tasks/filter/`, {field: "teamName", value: teamName}, { headers: headers}).subscribe(data => {
+      let tasks = data.body.Items;
+      this.dataStore.tasksByMembers = new Map<string, Task[]>();
+      tasks.forEach(t => {
+        let userLogin = t.userLogin ? t.userLogin : 'unassigned';
+        if(this.dataStore.tasksByMembers.has(userLogin))
+          this.dataStore.tasksByMembers.get(userLogin).push(t);
+        else
+          this.dataStore.tasksByMembers.set(userLogin, [t])
       });
-
-      if (notFound) {
-        this.dataStore.tasks.push(data);
-      }
-
-      this._tasks.next(Object.assign({}, this.dataStore).tasks);
-    }, error => console.log('Could not load task.'));
+      this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
+    }, error => this._error.next('Could not load tasks.'));
   }
+
+  // load(id: number | string) {
+  //   this.http.get<Task>(`${environment.apiUrl}/tasks/${id}`).subscribe(data => {
+  //     let notFound = true;
+
+  //     this.dataStore.tasksByMembers.forEach((item, index) => {
+  //       if (item.id === data.id) {
+  //         this.dataStore.tasks[index] = data;
+  //         notFound = false;
+  //       }
+  //     });
+
+  //     if (notFound) {
+  //       this.dataStore.tasks.push(data);
+  //     }
+
+  //     this._tasks.next(Object.assign({}, this.dataStore).tasks);
+  //   }, error => console.log('Could not load task.'));
+  // }
 
   create(task: Task) {
-    // this.http.post<Task>(`${environment.apiUrl}/tasks`, JSON.stringify(task)).subscribe(data => {
-    //   this.dataStore.tasks.push(data);
-    //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
-    // }, error => console.log('Could not create task.'));
-    task.id = this.taskId++;
-    this.dataStore.tasks.push(task);
-    this._tasks.next(Object.assign({}, this.dataStore).tasks);
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    task.id = uuidv4();
+
+    this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').push(task);
+    console.log(JSON.stringify(task));
+
+    this.http.post<Task>(`${environment.apiUrl}/tasks`, JSON.stringify(task), {headers: headers}).subscribe(data => {
+      this.loadAll(task.teamName);
+    }, error => this._error.next('Could not create task.'));
   }
 
   update(task: Task) {
-    // this.http.put<Task>(`${environment.apiUrl}/tasks/${task.id}`, JSON.stringify(task)).subscribe(data => {
-    //   this.dataStore.tasks.forEach((t, i) => {
-    //     if (t.id === data.id) { this.dataStore.tasks[i] = data; }
-    //   });
-
-    //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
-    // }, error => console.log('Could not update task.'));
-    this.dataStore.tasks.forEach((t, i) => {
-      if (t.id === task.id) { this.dataStore.tasks[i] = task; }
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     });
-    this._tasks.next(Object.assign({}, this.dataStore).tasks);
+
+    let taskToUpdate = Task.createToUpdate(task);
+
+    console.log(JSON.stringify(taskToUpdate));
+
+    this.http.post<Task>(`${environment.apiUrl}/tasks`, JSON.stringify(taskToUpdate), {headers: headers}).subscribe(data => {
+      this.loadAll(task.teamName);
+    }, error => this._error.next('Could not update task.'));
+    // this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').forEach((t, i) => {
+    //   if (t.id === task.id) { this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned')[i] = task; }
+    // });
+    // this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
   }
 
-  getTasksOf(userLogin?: string) {
-    if (userLogin)
-      return this.dataStore.tasks.filter(task => task.userLogin === userLogin);
-    else
-      return this.dataStore.tasks.filter(task => !task.userLogin);
-  }
-
-  remove(taskId: number) {
+  remove(task: Task) {
     // this.http.delete(`${environment.apiUrl}/tasks/${taskId}`).subscribe(response => {
     //   this.dataStore.tasks.forEach((t, i) => {
     //     if (t.id === taskId) { this.dataStore.tasks.splice(i, 1); }
@@ -86,10 +103,10 @@ export class TasksService {
 
     //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
     // }, error => console.log('Could not delete task.'));
-    this.dataStore.tasks.forEach((t, i) => {
-          if (t.id === taskId) { this.dataStore.tasks.splice(i, 1); }
+    this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').forEach((t, i) => {
+          if (t.id === task.id) { this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').splice(i, 1); }
         });
   
-        this._tasks.next(Object.assign({}, this.dataStore).tasks);
+        this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
   }
 }

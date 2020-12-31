@@ -16,9 +16,6 @@ export class AppComponent implements OnInit {
         this.authService.currentUser.subscribe(
             (currentUser: User)  => {
                 this.currentUser = currentUser;
-
-                if (this.currentUser)
-                    this.currentUser.role = Role.Worker; // for test frontend
             }
         );
     }
@@ -28,7 +25,11 @@ export class AppComponent implements OnInit {
     }
     
     get isAdmin() {
-        return this.currentUser && this.currentUser.role === Role.Admin;
+        return this.currentUser && Number(this.currentUser.userRole) === Role.Admin;
+    }
+
+    get isManager() {
+        return this.currentUser && Number(this.currentUser.userRole) === Role.Manager;
     }
 
     logout() {

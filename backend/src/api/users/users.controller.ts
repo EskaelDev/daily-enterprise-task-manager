@@ -1,54 +1,80 @@
 // import * as express from 'express';
-import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode, BodyParam, UseBefore } from "routing-controllers";
-import User from './user.interface'
+import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode, BodyParam, UseBefore, HeaderParam, UnauthorizedError, Res, BadRequestError, Delete, NotFoundError } from "routing-controllers";
+import User, { Role } from './user.interface'
 import UserService from "./user.service";
 import { Response } from 'express'
 import ApiResponse from "../../utils/api-response";
 import { AuthMiddleware } from "../../middleware/auth.middleware";
-import AuthorizationService from "../../services/auth.service";
+import AuthService from "../../services/auth.service";
+import jwt_decode from "jwt-decode";
+import { HttpResponse } from "aws-sdk";
+import { StatusCodes } from "http-status-codes";
+import { STATUS_CODES } from "http";
+import Filter from '../models/filter.model'
 
 @JsonController("/users")
 export default class UsersController {
-    private users: User[] = [
-        {
-            login: 'usr01',
-            password: 'halko'
-        },
-        {
-            login: 'usr02',
-            password: 'halko2'
-        }
-    ];
 
-    constructor(private userService: UserService, private authService:AuthorizationService) {
+    constructor(private userService: UserService, private authService: AuthService) {
 
     }
 
-    @Get()
-    public async getAll() {
-        return this.users;
-    }
+    // @Get()
+    // public async getAll() {
+    //     return this.users;
+    // }
 
+    @UseBefore(AuthMiddleware)
     @Get('/:userLogin')
-    public async getById(@Param('userLogin') userLogin: string) {
-        return this.users.find(u => u.login == userLogin);
+    public async GetById(@Res() res: Response, @Param('userLogin') userLogin: string, @HeaderParam("Authorization") token: string) {
+
+        if (this.authService.NotAdmin(token)) {
+
+            throw new UnauthorizedError();
+        }
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.GetUser(userLogin);
+            request.password = "";
+
+            let response: ApiResponse = {
+                successful: true,
+                caller: {
+                    class: 'UsersController',
+                    method: 'GetById'
+                },
+                body: request,
+            }
+            result(response)
+        });
+
+        if (response.successful) {
+            return res.status(StatusCodes.OK).send(response);
+        }
+
+        throw new BadRequestError(response.body);
+
     }
 
 
     @UseBefore(AuthMiddleware)
     @Post()
-    public async AddUser(@Body({ required: true }) user: User, @BodyParam('password',{required:true}) password:string) {
+    public async AddUser(@Res() res: Response, @Body({ required: true }) user: User, @BodyParam('password', { required: true }) password: string, @HeaderParam("Authorization") token: string) {
+        if (this.authService.NotAdmin(token)) {
 
-        return await new Promise(async (result) => {
-            let request = await this.userService.Create(user);
+            throw new UnauthorizedError();
+        }
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.Put(user);
 
             request
                 .on('error', res => {
                     let response: ApiResponse = {
-                        statusCode: 400,
+                        successful: false,
                         caller: {
-                            class: 'TablesController',
-                            method: 'createUsers'
+                            class: 'UsersController',
+                            method: 'AddUser'
                         },
                         body: res.message,
                     }
@@ -56,16 +82,23 @@ export default class UsersController {
                 })
                 .on('success', res => {
                     let response: ApiResponse = {
-                        statusCode: 200,
+                        successful: true,
                         caller: {
-                            class: 'TablesController',
-                            method: 'createUsers'
+                            class: 'UsersController',
+                            method: 'AddUser'
                         },
                         body: res.data
                     }
                     result(response)
                 });
-        }).catch(error => console.log(error));
+        });
+
+        if (response.successful) {
+
+            return res.status(StatusCodes.CREATED).send(response);
+        }
+
+        throw new BadRequestError(response.body);
 
     }
 
@@ -74,5 +107,133 @@ export default class UsersController {
         return this.authService.Login(body.login, body.password)
     }
 
+
+
+
+    @Post('/admin')
+    public async AddAdmin(@Res() res: Response, @Body({ required: true }) user: User, @BodyParam('password', { required: true }) password: string, @HeaderParam("Authorization") token: string) {
+        if (this.authService.NotAdmin(token)) {
+
+            throw new UnauthorizedError();
+        }
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.Put(user);
+
+            request
+                .on('error', res => {
+                    let response: ApiResponse = {
+                        successful: false,
+                        caller: {
+                            class: 'UsersController',
+                            method: 'AddAdmin'
+                        },
+                        body: res.message,
+                    }
+                    result(response)
+                })
+                .on('success', res => {
+                    let response: ApiResponse = {
+                        successful: true,
+                        caller: {
+                            class: 'UsersController',
+                            method: 'AddAdmin'
+                        },
+                        body: res.data
+                    }
+                    result(response)
+                });
+        });
+
+        if (response.successful) {
+
+            return res.status(StatusCodes.CREATED).send(response);
+        }
+
+        throw new BadRequestError(response.body);
+
+    }
+
+
+    @UseBefore(AuthMiddleware)
+    @Delete('/:id')
+    public async DeleteTask(@Param('taskId') id: string, @Res() res: Response, @HeaderParam("Authorization") token: string) {
+        if (this.authService.NotAdmin(token)) {
+
+            throw new UnauthorizedError();
+        }
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.Delete('id', id);
+
+            request
+                .on('error', res => {
+                    let response: ApiResponse = {
+                        successful: false,
+                        caller: {
+                            class: 'UserController',
+                            method: 'DeleteUser'
+                        },
+                        body: res.message
+                    }
+                    result(response)
+                })
+                .on('success', res => {
+                    let response: ApiResponse = {
+                        successful: true,
+                        caller: {
+                            class: 'UserController',
+                            method: 'DeleteUser'
+                        },
+                        body: res.data
+                    }
+                    result(response)
+                });
+        });
+
+        if (response.successful) {
+            return res.status(StatusCodes.OK).send(response);
+        }
+        throw new NotFoundError(response.body);
+
+    }
+
+
+    @UseBefore(AuthMiddleware)
+    @Post('/filter')
+    public async Filter(@Res() res: Response, @Body({ required: true }) filter: Filter, @HeaderParam("Authorization") token: string) {
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.Filter(filter);
+            request
+                .on('error', res => {
+                    let response: ApiResponse = {
+                        successful: false,
+                        caller: {
+                            class: 'UsersController',
+                            method: 'Filter'
+                        },
+                        body: res.message
+                    }
+                    result(response)
+                })
+                .on('success', res => {
+                    let response: ApiResponse = {
+                        successful: true,
+                        caller: {
+                            class: 'UsersController',
+                            method: 'Filter'
+                        },
+                        body: res.data
+                    }
+                    result(response)
+                });
+        });
+
+        if (response.successful) {
+            return res.status(StatusCodes.OK).send(response);
+        }
+
+        throw new NotFoundError(response.body);
+    }
 
 }
