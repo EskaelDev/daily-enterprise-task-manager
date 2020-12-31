@@ -19,6 +19,7 @@ import { TeamsAdminComponent } from './teams-admin/teams-admin.component';
 import { TeamAdminComponent } from './teams-admin/team-admin/team-admin.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
+import { UsersComponent } from './users/users.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     BreadcrumbComponent,
     TeamsComponent,
     TeamsAdminComponent,
-    TeamAdminComponent
+    TeamAdminComponent,
+    UsersComponent
   ],
   imports: [
     BrowserModule,
@@ -39,7 +41,7 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
     ReactiveFormsModule,
     HttpClientModule,
     FontAwesomeModule,
-    TagInputModule, 
+    TagInputModule,
     BrowserAnimationsModule,
     DragDropModule,
     ScrollingModule,

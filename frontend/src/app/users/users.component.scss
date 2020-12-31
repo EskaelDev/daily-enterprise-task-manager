@@ -1,0 +1,25 @@
+.search {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  align-content: flex-end;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.icons {
+  width: 108px;
+  position: fixed;
+  border-top: none;
+}
+
+button {
+  background: none;
+  border-color: transparent;
+}
+
+.search{
+  float: right;
+}

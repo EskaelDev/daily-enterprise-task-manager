@@ -7,6 +7,7 @@ import { TeamsAdminComponent } from './teams-admin/teams-admin.component';
 import { TeamComponent } from './teams/team/team.component';
 import { TeamsComponent } from './teams/teams.component';
 import { UsersComponent } from './users/users.component';
+import {TeamAdminComponent} from './teams-admin/team-admin/team-admin.component';
 
 const routes: Routes = [
 {
@@ -93,7 +94,7 @@ const routes: Routes = [
   {
     path: 'users',
     data: {
-      breadcrumb: null
+      breadcrumb: 'Users'
     },
     component: UsersComponent
 }
