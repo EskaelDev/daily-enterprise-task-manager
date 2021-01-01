@@ -73,7 +73,7 @@ export default class TeamController {
                     successful: true,
                     caller: {
                         class: 'TeamController',
-                        method: 'GetById'
+                        method: 'GetAll'
                     },
                     body: request
                 }
@@ -84,7 +84,7 @@ export default class TeamController {
                     successful: false,
                     caller: {
                         class: 'TeamController',
-                        method: 'GetById'
+                        method: 'GetAll'
                     },
                     body: "Empty"
                 }
