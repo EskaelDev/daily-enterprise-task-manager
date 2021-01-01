@@ -58,6 +58,52 @@ export default class UsersController {
 
 
     @UseBefore(AuthMiddleware)
+    @Get('/all')
+    public async GetAll(@Res() res: Response, @Param('userLogin') userLogin: string, @HeaderParam("Authorization") token: string) {
+
+        if (this.authService.NotAdmin(token)) {
+
+            throw new UnauthorizedError();
+        }
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.GetAll();
+            if (request) {
+                let response: ApiResponse = {
+                    successful: true,
+                    caller: {
+                        class: 'UserController',
+                        method: 'GetAll'
+                    },
+                    body: request
+                }
+                result(response)
+            }
+            else {
+                let response: ApiResponse = {
+                    successful: false,
+                    caller: {
+                        class: 'UserController',
+                        method: 'GetAll'
+                    },
+                    body: "Empty"
+                }
+                result(response)
+            }
+        });
+
+        if (response.successful) {
+            for (let index = 0; index < response.body.length; index++) {
+                response.body[index].password = '';
+            }
+            return res.status(StatusCodes.OK).send(response);
+        }
+
+        throw new BadRequestError(response.body);
+
+    }
+
+
+    @UseBefore(AuthMiddleware)
     @Post()
     public async AddUser(@Res() res: Response, @Body({ required: true }) user: User, @BodyParam('password', { required: true }) password: string, @HeaderParam("Authorization") token: string) {
         if (this.authService.NotAdmin(token)) {
