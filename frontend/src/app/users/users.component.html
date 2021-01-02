@@ -3,9 +3,9 @@
   <p style="color: #fff;">Administrator panel</p>
 </div>
 
-<div class="container col-8">
-  <div class="row toolbar col-12">
-    <nav class="navbar navbar-expand-md bg-dark navbar-dark col-lg-12">
+<div class="container">
+  <div class="row toolbar">
+    <nav class="navbar navbar-expand-md bg-dark navbar-dark col-12">
       <div class="col-2">
         <a class="navbar-brand">Manage users</a>
       </div>
@@ -34,7 +34,7 @@
   </div>
 
 
-  <div class="row col-12">
+  <div class="row">
     <!--Grid column-->
     <table class="table">
       <thead>
@@ -50,10 +50,28 @@
 
       <tbody>
       <tr *ngFor="let user of users; let i = index;">
-        <td>{{user.userName}}</td>
-        <td>{{user.surname}}</td>
-        <td> {{user.login}}</td>
-        <td>{{getRoleName(user.userRole)}}</td>
+        <td>
+          <div class="form-row">
+            <input [(ngModel)]="user.userName" type="text" class="userInput">
+          </div>
+<!--          {{ user.userName}}-->
+        </td>
+        <td>
+          <div class="form-row">
+            <input [(ngModel)]="user.surname" type="text" class="userInput">
+          </div>
+        </td>
+        <td>
+          <div class="form-row">
+            <input [(ngModel)]="user.login" type="text" class="userInput">
+          </div>
+        </td>
+        <td>
+          <div class="form-row">
+            <input [(ngModel)]="user.userRole" type="text" class="userInput" disabled>
+          </div>
+          <!--          {{getRoleName(user.userRole)}}-->
+        </td>
         <td class="icons">
           <button type="button" class="btn btn-secondary" (click)="editUser(i)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -100,24 +118,30 @@
       </div>
       <div class="modal-body">
         <form>
+
           <div class="form-group">
             <label for="recipient-add" class="col-form-label">Name:</label>
-            <input [(ngModel)]="newUser.userName" type="text" class="form-control" id="recipient-add">
+            <input [(ngModel)]="newUser.userName" name="name" type="text" class="form-control" id="recipient-add">
           </div>
           <div class="form-group">
             <label for="recipient-add" class="col-form-label">Surame:</label>
-            <input [(ngModel)]="newUser.surname" type="text" class="form-control" id="recipient-surname">
+            <input [(ngModel)]="newUser.surname" name="surname" type="text" class="form-control" id="recipient-surname">
           </div>
           <div class="form-group">
             <label for="recipient-add" class="col-form-label">Login:</label>
-            <input [(ngModel)]="newUser.login" type="text" class="form-control" id="recipient-login">
+            <input [(ngModel)]="newUser.login" name="login" type="text" class="form-control" id="recipient-login">
+          </div>
+          <div class="form-group">
+            <label for="recipient-add" class="col-form-label">Password:</label>
+            <input [(ngModel)]="newUser.password" name="password" type="text" class="form-control"
+                   id="recipient-password">
           </div>
           <div class="form-group">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               Role
             </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" >
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
               <a class="dropdown-item" (click)="setUserRole(0)">Admin</a>
               <a class="dropdown-item" (click)="setUserRole(1)">Manager</a>
               <a class="dropdown-item" (click)="setUserRole(2)">Worker</a>

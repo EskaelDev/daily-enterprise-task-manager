@@ -64,14 +64,14 @@ export class TeamAdminComponent implements OnInit {
                 });
             }
         });
-        
-        this.usersService.getAll(this.authService.currentUserValue.token, Role.Manager).subscribe(
+
+        this.usersService.getAllWithRole(this.authService.currentUserValue.token, Role.Manager).subscribe(
             data => { this.managers = data.body.Items},
             error => { //TODO
             }
           );
-        
-        this.usersService.getAll(this.authService.currentUserValue.token, Role.Worker).subscribe(
+
+        this.usersService.getAllWithRole(this.authService.currentUserValue.token, Role.Worker).subscribe(
             data => { this.workers = data.body.Items},
             error => { //TODO
             }

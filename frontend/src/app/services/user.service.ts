@@ -12,13 +12,21 @@ import { AuthService } from './auth.service';
 export class UserService {
   constructor(private http: HttpClient) { }
 
-  getAll(currUserToken: string, userRole: Role) {
+  getAllWithRole(currUserToken: string, userRole: Role) {
       const headers = new HttpHeaders({
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${currUserToken}`
       });
 
       return this.http.post<any>(`${environment.apiUrl}/users/filter`, {field: "userRole", value: `${userRole}`}, {headers: headers});
+  }
+
+  getAll(currUserToken: string) {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${currUserToken}`
+    });
+    return this.http.post<any>(`${environment.apiUrl}/users/all`, {headers: headers});
   }
 
   getUser(login: string, password: string) {
