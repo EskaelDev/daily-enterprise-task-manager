@@ -24,42 +24,11 @@ export default class UsersController {
     //     return this.users;
     // }
 
-    @UseBefore(AuthMiddleware)
-    @Get('/:userLogin')
-    public async GetById(@Res() res: Response, @Param('userLogin') userLogin: string, @HeaderParam("Authorization") token: string) {
-
-        if (this.authService.NotAdmin(token)) {
-
-            throw new UnauthorizedError();
-        }
-
-        let response: ApiResponse = await new Promise(async (result) => {
-            let request = await this.userService.GetUser(userLogin);
-            request.password = "";
-
-            let response: ApiResponse = {
-                successful: true,
-                caller: {
-                    class: 'UsersController',
-                    method: 'GetById'
-                },
-                body: request,
-            }
-            result(response)
-        });
-
-        if (response.successful) {
-            return res.status(StatusCodes.OK).send(response);
-        }
-
-        throw new BadRequestError(response.body);
-
-    }
 
 
     @UseBefore(AuthMiddleware)
     @Get('/all')
-    public async GetAll(@Res() res: Response, @Param('userLogin') userLogin: string, @HeaderParam("Authorization") token: string) {
+    public async GetAll(@Res() res: Response,  @HeaderParam("Authorization") token: string) {
 
         if (this.authService.NotAdmin(token)) {
 
@@ -102,6 +71,38 @@ export default class UsersController {
 
     }
 
+
+    @UseBefore(AuthMiddleware)
+    @Get('/:userLogin')
+    public async GetById(@Res() res: Response, @Param('userLogin') userLogin: string, @HeaderParam("Authorization") token: string) {
+
+        if (this.authService.NotAdmin(token)) {
+
+            throw new UnauthorizedError();
+        }
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.GetUser(userLogin);
+            request.password = "";
+
+            let response: ApiResponse = {
+                successful: true,
+                caller: {
+                    class: 'UsersController',
+                    method: 'GetById'
+                },
+                body: request,
+            }
+            result(response)
+        });
+
+        if (response.successful) {
+            return res.status(StatusCodes.OK).send(response);
+        }
+
+        throw new BadRequestError(response.body);
+
+    }
 
     @UseBefore(AuthMiddleware)
     @Post()

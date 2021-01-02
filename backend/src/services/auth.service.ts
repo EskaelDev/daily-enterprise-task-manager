@@ -35,9 +35,9 @@ export default class AuthService {
         return {
             login: decodedToken.login,
             password: decodedToken.password,
-            userRole: decodedToken.role,
-            userLanguage: decodedToken.language,
-            userName: decodedToken.name,
+            userRole: decodedToken.userRole,
+            userLanguage: decodedToken.userLanguage,
+            userName: decodedToken.userName,
             surname: decodedToken.surname
         }
     }
