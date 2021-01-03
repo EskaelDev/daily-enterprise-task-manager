@@ -24,8 +24,6 @@ export class TeamsService {
       'Authorization': `Bearer ${token}`
     });
 
-    managerLogin = "druciak"
-
     if (managerLogin)
     {
       this.http.post<any>(`${environment.apiUrl}/teams/filter`, {field: "manager", value: managerLogin}, {headers: headers}).subscribe(
@@ -36,7 +34,7 @@ export class TeamsService {
     } else {
       this.http.get<any>(`${environment.apiUrl}/teams/all`, {headers: headers}).subscribe(
         data => {
-          this.dataStore.teams = data.body.Items;
+          this.dataStore.teams = data.body;
           this._teams.next(Object.assign({}, this.dataStore).teams);
       }, () => this._error.next("Cannot load teams"));
     }
@@ -105,17 +103,18 @@ export class TeamsService {
   }
 
   remove(teamName: string) {
-    // this.http.delete(`${environment.apiUrl}/teams/${teamId}`).subscribe(response => {
-    //   this.dataStore.teams.forEach((t, i) => {
-    //     if (t.id === teamId) { this.dataStore.teams.splice(i, 1); }
-    //   });
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
 
-    //   this._teams.next(Object.assign({}, this.dataStore).teams);
-    // }, error => console.log('Could not delete team.'));
-    // this.dataStore.teams.forEach((t, i) => {
-    //       if (t.teamName === teamName) { this.dataStore.teams.splice(i, 1); }
-    //     });
-  
-    //     this._teams.next(Object.assign({}, this.dataStore).teams);
+    this.http.delete(`${environment.apiUrl}/teams/${teamName}`, {headers: headers}).subscribe(response => {
+      this.dataStore.teams.forEach((t, i) => {
+        if (t.teamName === teamName) { this.dataStore.teams.splice(i, 1); }
+      });
+
+      this._teams.next(Object.assign({}, this.dataStore).teams);
+    }, error => console.log('Could not delete team.'));
   }
 }

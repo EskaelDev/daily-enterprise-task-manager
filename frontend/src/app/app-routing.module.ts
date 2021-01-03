@@ -21,6 +21,18 @@ const routes: Routes = [
             component: HomeComponent
         },
         {
+            path: 'users',
+            data: {
+                breadcrumb: 'Users'
+            },
+            children: [
+                {
+                    path: '',
+                    component: UsersComponent
+                }
+            ]
+        },
+        {
             path: 'teams',
             data: {
                 breadcrumb: 'Teams'
@@ -90,13 +102,6 @@ const routes: Routes = [
         breadcrumb: null
     },
     component: LoginComponent
-},
-  {
-    path: 'users',
-    data: {
-      breadcrumb: 'Users'
-    },
-    component: UsersComponent
 }
 ];
 
