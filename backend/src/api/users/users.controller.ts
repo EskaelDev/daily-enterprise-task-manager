@@ -1,5 +1,5 @@
 // import * as express from 'express';
-import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode, BodyParam, UseBefore, HeaderParam, UnauthorizedError, Res, BadRequestError, Delete, NotFoundError } from "routing-controllers";
+import { JsonController, Body, Get, Post, HttpError, Param, Controller, HttpCode, BodyParam, UseBefore, HeaderParam, UnauthorizedError, Res, BadRequestError, Delete, NotFoundError, Put } from "routing-controllers";
 import User, { Role } from './user.interface'
 import UserService from "./user.service";
 import { Response } from 'express'
@@ -283,4 +283,60 @@ export default class UsersController {
         throw new NotFoundError(response.body);
     }
 
+
+    
+    @UseBefore(AuthMiddleware)
+    @Put()
+    public async UpdateUser(@Res() res: Response, @Body({ required: true }) user: User, @HeaderParam("Authorization") token: string) {
+        if (this.authService.NotAdmin(token)) {
+
+            throw new UnauthorizedError();
+        }
+
+        let userDb: User = await new Promise(async (result) => {
+            let request = await this.userService.GetUser(user.login);
+            result(request)
+        });
+
+        if(user==null)
+            throw new NotFoundError();
+            
+        user.password = userDb.password;
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.userService.Put(user);
+
+            request
+                .on('error', res => {
+                    let response: ApiResponse = {
+                        successful: false,
+                        caller: {
+                            class: 'UsersController',
+                            method: 'UpdateUser'
+                        },
+                        body: res.message,
+                    }
+                    result(response)
+                })
+                .on('success', res => {
+                    let response: ApiResponse = {
+                        successful: true,
+                        caller: {
+                            class: 'UsersController',
+                            method: 'UpdateUser'
+                        },
+                        body: res.data
+                    }
+                    result(response)
+                });
+        });
+
+        if (response.successful) {
+
+            return res.status(StatusCodes.CREATED).send(response);
+        }
+
+        throw new BadRequestError(response.body);
+
+    }
 }
