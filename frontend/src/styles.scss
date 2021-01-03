@@ -117,6 +117,20 @@ tag{
     border-color: rgb(104, 18, 27) !important;
 }
 
+.alert-info {
+    color: rgb(142, 227, 241) !important;
+    background-color: rgb(20, 59, 67) !important;
+    border-color: rgb(30, 89, 97) !important;
+}
+
+.alert-success {
+    color: rgb(153, 230, 171) !important;
+    background-color: rgb(26, 62, 41) !important;
+    border-color: rgb(37, 90, 50) !important;
+}
+
 .table {
     color: #adb5bd !important;
 }
+/* Importing Bootstrap SCSS file. */
+@import '~bootstrap/scss/bootstrap';

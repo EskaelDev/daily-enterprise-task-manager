@@ -65,16 +65,21 @@ export class TeamsService {
       }
 
       this._teams.next(Object.assign({}, this.dataStore).teams);
-    }, () => this._error.next('Could not load team.'));
+    }, error => this._error.next('Could not load team.'));
   }
 
   create(team: Team) {
-    // this.http.post<Team>(`${environment.apiUrl}/teams`, JSON.stringify(team)).subscribe(data => {
-    //   this.dataStore.teams.push(data);
-    //   this._teams.next(Object.assign({}, this.dataStore).teams);
-    // }, error => console.log('Could not create team.'));
-    this.dataStore.teams.push(team);
-    this._teams.next(Object.assign({}, this.dataStore).teams);
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    let teamToUpdate = Team.prepareToUpdate(team);
+
+    this.http.post<Team>(`${environment.apiUrl}/teams`, JSON.stringify(teamToUpdate), {headers: headers}).subscribe(data => {
+      this.load(team.teamName);
+    }, error => this._error.next('Could not create team.'));
   }
 
   update(team: Team) {
@@ -107,10 +112,10 @@ export class TeamsService {
 
     //   this._teams.next(Object.assign({}, this.dataStore).teams);
     // }, error => console.log('Could not delete team.'));
-    this.dataStore.teams.forEach((t, i) => {
-          if (t.teamName === teamName) { this.dataStore.teams.splice(i, 1); }
-        });
+    // this.dataStore.teams.forEach((t, i) => {
+    //       if (t.teamName === teamName) { this.dataStore.teams.splice(i, 1); }
+    //     });
   
-        this._teams.next(Object.assign({}, this.dataStore).teams);
+    //     this._teams.next(Object.assign({}, this.dataStore).teams);
   }
 }

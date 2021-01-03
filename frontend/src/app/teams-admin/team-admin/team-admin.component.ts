@@ -2,14 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { Team } from 'src/app/models/team';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { TeamsService } from 'src/app/services/teams.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { AlertService } from 'src/app/services/alert.service';
 import { User } from 'src/app/models/user';
 import { UserService } from 'src/app/services/user.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { Role } from 'src/app/models/role.enum';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-team-admin',
@@ -23,10 +24,36 @@ export class TeamAdminComponent implements OnInit {
     workers: User[];
     
     teamForm: FormGroup;
+
     isNewTeam = false;
+    isUpdating = false;
+    isDeleting = false;
+    submitted = false;
+    isPosted = false;
+
+    formatter = (user: User) => `${user.surname} ${user.userName}`;
+    searchManagers = (text$: Observable<string>) =>
+        text$.pipe(
+        debounceTime(200),
+        distinctUntilChanged(),
+        map(term => term === '' ? []
+            : this.managers.filter(m => (`${m.surname} ${m.userName}`).toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+        );
+
+    searchMembers = (text$: Observable<string>) =>
+        text$.pipe(
+        debounceTime(200),
+        distinctUntilChanged(),
+        map(term => term === '' ? []
+            : this.workers.filter(w => (`${w.surname} ${w.userName}`).toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+        );
+    chosenManager: User;
+    chosenWorker: User;
 
     // icons
     faTimes = faTimes;
+
+    get f() { return this.teamForm.controls; }
     
     constructor(private teamsService: TeamsService, private fb: FormBuilder, private route: ActivatedRoute,
         private alertService: AlertService, private router: Router,
@@ -34,7 +61,7 @@ export class TeamAdminComponent implements OnInit {
 
     ngOnInit(): void {
         this.teamForm = this.fb.group({
-            teamName: [''],
+            teamName: ['', Validators.required],
             department: ['']
         });
 
@@ -55,11 +82,22 @@ export class TeamAdminComponent implements OnInit {
                             department: this.team.department ? this.team.department : ''
                         });
                     }
+
+                    if (this.isUpdating && !this.isNewTeam)
+                    {
+                        this.isUpdating = false;
+                        this.alertService.success("Team successfully updated.");
+                    } else if (this.isUpdating)
+                    {
+                        this.isUpdating = false;
+                        this.alertService.success("Team successfully created.");
+                    }
                 });
 
                 this.teamsService.error.subscribe(error => {
                     if (error !== "") {
-                    this.alertService.error(error);
+                        this.alertService.error(error);
+                        this.isUpdating = false;
                     }
                 });
             }
@@ -67,13 +105,13 @@ export class TeamAdminComponent implements OnInit {
 
         this.usersService.getAllWithRole(this.authService.currentUserValue.token, Role.Manager).subscribe(
             data => { this.managers = data.body.Items},
-            error => { //TODO
+            error => { this.alertService.error("Can not load managers...");
             }
           );
 
         this.usersService.getAllWithRole(this.authService.currentUserValue.token, Role.Worker).subscribe(
             data => { this.workers = data.body.Items},
-            error => { //TODO
+            error => { this.alertService.error("Can not load workers...");
             }
           );
     }
@@ -93,5 +131,80 @@ export class TeamAdminComponent implements OnInit {
     onCancelClicked()
     {
         this.router.navigate(["teams-admin"]);
+    }
+
+    public handleStaticResultSelected (result) {
+        console.log(result);
+    }
+
+    selectedManager(event, inputManager) {
+        event.preventDefault();
+        if (event.item.login !== this.team.manager) {
+            this.team.Manager = event.item;
+            this.team.manager = event.item.login;
+            this.chosenManager = null;
+            inputManager.value = '';
+        } else {
+            this.alertService.info("Can not add the same manager to the team!");
+        }
+    }
+
+    selectedWorker(event, inputWorker) {
+        event.preventDefault();
+        if (!this.team.members.includes(event.item.login)) {
+            this.team.Members.push(event.item);
+            this.team.members.push(event.item.login);
+            this.chosenWorker = null;
+            inputWorker.value = '';
+        } else {
+            this.alertService.info("Can not add the same member to the team!");
+        }
+    }
+
+    onSaveClicked()
+    {
+        this.submitted = true;
+
+        if (this.isNewTeam && this.teamForm.valid)
+        {
+            this.isUpdating = true;
+            this.team.teamName = this.teamForm.get("teamName").value;
+            this.team.department = this.teamForm.get("department").value;
+
+            this.teamsService.teams.subscribe(teams => {
+                let team = teams.find(t => t.teamName === this.team.teamName);
+
+                if (team)
+                {
+                    this.isUpdating = false;
+                    this.alertService.success("Team successfully created.");
+                    this.isPosted = true;
+                }
+            });
+
+            this.teamsService.create(this.team);
+        } else if (!this.isNewTeam){
+            this.isUpdating = true;
+            this.team.department = this.teamForm.get("department").value;
+            this.teamsService.update(this.team);
+        } else {
+            this.isUpdating = false;
+        }
+    }
+
+    onDeleteClicked()
+    {
+        this.isDeleting = true;
+        this.teamsService.teams.subscribe(teams => {
+            let team = teams.find(t => t.teamName === this.team.teamName);
+
+            if (!team)
+            {
+                this.isDeleting = false;
+                this.alertService.success("Team successfully deleted.");
+                this.isPosted = true;
+            }
+        });
+        this.teamsService.remove(this.team.teamName);
     }
 }

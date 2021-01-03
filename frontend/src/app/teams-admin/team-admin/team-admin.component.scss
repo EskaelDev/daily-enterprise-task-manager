@@ -19,3 +19,11 @@
       text-shadow: none;
     }
 }
+
+::ng-deep .dropdown-menu { 
+    background-color: #495057; 
+}
+
+::ng-deep .dropdown-item.active { 
+    background-color: #117a8b; 
+}
