@@ -49,12 +49,13 @@ export class UsersComponent implements OnInit {
     this.usersService.remove(userToDelete.login);
   }
 
-  getRoleName(userRole: Role): string {
-    if (userRole === 0) {
+  getRoleName(role: Role): string {
+    var userRole = role.toString();
+    if (userRole === '0') {
       return 'Admin';
-    } else if (userRole === 1) {
+    } else if (userRole === '1') {
       return 'Manager';
-    } else if (userRole === 2) {
+    } else if (userRole === '2') {
       return 'Worker';
     }
   }

@@ -58,7 +58,6 @@ export class UsersService {
     this.http.put<User>(`${environment.apiUrl}/users/`, JSON.stringify(userToUpdate), {headers: headers}).subscribe(() => {
       this.load(user.login);
     }, () => this._error.next('Could not edit user.'));
-    //TODO
   }
 
   load(login: string) {
