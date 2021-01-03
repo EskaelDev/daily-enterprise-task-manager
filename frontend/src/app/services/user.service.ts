@@ -21,13 +21,13 @@ export class UserService {
       return this.http.post<any>(`${environment.apiUrl}/users/filter`, {field: "userRole", value: `${userRole}`}, {headers: headers});
   }
 
-  getAll(currUserToken: string) {
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${currUserToken}`
-    });
-    return this.http.post<any>(`${environment.apiUrl}/users/all`, {headers: headers});
-  }
+  // getAll(currUserToken: string) {
+  //   const headers = new HttpHeaders({
+  //     'Content-Type': 'application/json',
+  //     'Authorization': `Bearer ${currUserToken}`
+  //   });
+  //   return this.http.post<any>(`${environment.apiUrl}/users/all`, {headers: headers});
+  // }
 
   getUser(login: string, password: string) {
       return this.http.post<string>(`${environment.apiUrl}/users/login`, {login, password});
