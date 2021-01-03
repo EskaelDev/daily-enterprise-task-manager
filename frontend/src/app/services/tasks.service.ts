@@ -89,24 +89,21 @@ export class TasksService {
     this.http.post<Task>(`${environment.apiUrl}/tasks`, JSON.stringify(taskToUpdate), {headers: headers}).subscribe(data => {
       this.loadAll(task.teamName);
     }, error => this._error.next('Could not update task.'));
-    // this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').forEach((t, i) => {
-    //   if (t.id === task.id) { this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned')[i] = task; }
-    // });
-    // this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
   }
 
   remove(task: Task) {
-    // this.http.delete(`${environment.apiUrl}/tasks/${taskId}`).subscribe(response => {
-    //   this.dataStore.tasks.forEach((t, i) => {
-    //     if (t.id === taskId) { this.dataStore.tasks.splice(i, 1); }
-    //   });
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
 
-    //   this._tasks.next(Object.assign({}, this.dataStore).tasks);
-    // }, error => console.log('Could not delete task.'));
-    this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').forEach((t, i) => {
-          if (t.id === task.id) { this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').splice(i, 1); }
-        });
-  
-        this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
+    this.http.delete(`${environment.apiUrl}/tasks/${task.id}`, {headers: headers}).subscribe(response => {
+      this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').forEach((t, i) => {
+        if (t.id === task.id) { this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').splice(i, 1); }
+      });
+
+      this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
+    }, error => this._error.next('Could not delete task.'));
   }
 }

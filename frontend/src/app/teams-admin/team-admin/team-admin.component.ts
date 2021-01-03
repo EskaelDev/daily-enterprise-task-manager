@@ -62,7 +62,7 @@ export class TeamAdminComponent implements OnInit {
     ngOnInit(): void {
         this.teamForm = this.fb.group({
             teamName: ['', Validators.required],
-            department: ['']
+            department: ['', Validators.required]
         });
 
         this.route.params.pipe(map(p => p.teamName)).subscribe(teamName => {
@@ -183,7 +183,7 @@ export class TeamAdminComponent implements OnInit {
             });
 
             this.teamsService.create(this.team);
-        } else if (!this.isNewTeam){
+        } else if (!this.isNewTeam && this.teamForm.valid){
             this.isUpdating = true;
             this.team.department = this.teamForm.get("department").value;
             this.teamsService.update(this.team);

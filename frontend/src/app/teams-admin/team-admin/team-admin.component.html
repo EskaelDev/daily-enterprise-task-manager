@@ -11,7 +11,10 @@
             </div>
             <div class="col">
                 <label for="teamDepartment">Team department</label>
-                <input type="text" class="form-control form-control-sm dark-border" formControlName="department" [readonly]="isPosted">
+                <input type="text" class="form-control form-control-sm dark-border" formControlName="department" [readonly]="isPosted" [ngClass]="{ 'is-invalid': submitted && f.department.errors }">
+                <div *ngIf="submitted && f.department.errors" class="invalid-feedback">
+                    <div *ngIf="f.department.errors.required">department name is required</div>
+                </div>
             </div>
         </div>
         <div class="row mt-3">

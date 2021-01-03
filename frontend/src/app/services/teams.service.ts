@@ -91,7 +91,7 @@ export class TeamsService {
     console.log(JSON.stringify(teamToUpdate));
     this.http.post<Team>(`${environment.apiUrl}/teams/`, JSON.stringify(teamToUpdate), {headers: headers}).subscribe(() => {
       this.load(team.teamName);
-    }, () => this._error.next('Could not update team.'));
+    }, error => this._error.next('Could not update team.'));
   }
 
   getTeamsOf(managerLogin: string) {

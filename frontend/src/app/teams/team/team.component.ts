@@ -69,6 +69,8 @@ export class TeamComponent implements OnInit {
                                         if (!this.tasksByMembers.has(member.login))
                                             this.tasksByMembers.set(member.login, []);
                                     });
+                                if (!this.tasksByMembers.has('unassigned'))
+                                    this.tasksByMembers.set('unassigned', []);
                                 this.isLoading = false;
                             }
                         );
