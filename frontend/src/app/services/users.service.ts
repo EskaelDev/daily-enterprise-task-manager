@@ -35,15 +35,14 @@ export class UsersService {
 
   create(user: User) {
     const token = this.authService.currentUserValue.token;
-
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    this.dataStore.users.push(user);
-    this._users.next(Object.assign({}, this.dataStore).users);
     return this.http.post<User>(`${environment.apiUrl}/users`, JSON.stringify(user), {headers: headers}).subscribe(() => {
+      this.dataStore.users.push(user);
+      this._users.next(Object.assign({}, this.dataStore).users);
     }, () => this._error.next('Could not create user.'));
   }
 
@@ -53,23 +52,55 @@ export class UsersService {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
+
+    let userToUpdate = User.prepareToUpdate(user);
+    console.log(JSON.stringify(userToUpdate));
+    this.http.put<User>(`${environment.apiUrl}/users/`, JSON.stringify(userToUpdate), {headers: headers}).subscribe(() => {
+      this.load(user.login);
+    }, () => this._error.next('Could not edit user.'));
     //TODO
   }
 
-  remove(user: User) {
+  load(login: string) {
     const token = this.authService.currentUserValue.token;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    this.dataStore.users.forEach((u, i) => {
-      if (u.login === user.login) {
-        this.dataStore.users.splice(i, 1);
+    this.http.get<any>(`${environment.apiUrl}/users/${login}`, { headers: headers}).subscribe(data => {
+      let notFound = true;
+      let user: User = data.body;
+
+      this.dataStore.users.forEach((item, index) => {
+        if (item.login === user.login) {
+          this.dataStore.users[index] = user;
+          notFound = false;
+        }
+      });
+
+      if (notFound) {
+        this.dataStore.users.push(user);
       }
+
+      this._users.next(Object.assign({}, this.dataStore).users);
+    }, () => this._error.next('Could not load user.'));
+  }
+
+  remove(userLogin: string) {
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
     });
-    this._users.next(Object.assign({}, this.dataStore).users);
-    return this.http.delete<string>(`${environment.apiUrl}/users/${user.login}`, {headers: headers}).subscribe(() => {
+
+    return this.http.delete<string>(`${environment.apiUrl}/users/${userLogin}`, {headers: headers}).subscribe(() => {
+      this.dataStore.users.forEach((u, i) => {
+        if (u.login === userLogin) {
+          this.dataStore.users.splice(i, 1);
+        }
+      });
+      this._users.next(Object.assign({}, this.dataStore).users);
     }, () => this._error.next('Could not delete user.'));
   }
 }

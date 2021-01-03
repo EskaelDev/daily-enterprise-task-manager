@@ -19,6 +19,7 @@ import {AlertService} from '../services/alert.service';
 export class UsersComponent implements OnInit {
 
   newUser: User = new User();
+  changedUser: User = new User();
   users: User[];
   searchText = '';
   isLoading = true;
@@ -45,7 +46,7 @@ export class UsersComponent implements OnInit {
   }
 
   onDeleteUserClicked(userToDelete: User) {
-    this.usersService.remove(userToDelete);
+    this.usersService.remove(userToDelete.login);
   }
 
   getRoleName(userRole: Role): string {
@@ -58,15 +59,20 @@ export class UsersComponent implements OnInit {
     }
   }
 
-  setUserRole(role: Role): void {
-    this.newUser.userRole = role;
+  setUserRole(role: Role, user: User): void {
+    user.userRole = role;
   }
 
-  editUser(i: number) {
+  copyDataFromUser(user: User) {
+    this.changedUser = user;
+  }
 
+  editUser() {
+    this.usersService.update(this.changedUser);
   }
 
   addNewUser() {
     this.usersService.create(this.newUser);
+    this.newUser = new User();
   }
 }
