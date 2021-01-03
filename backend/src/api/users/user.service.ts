@@ -13,6 +13,7 @@ import { ErrorCause } from 'aws-sdk/clients/qldb';
 import crypto from 'crypto'
 import { bool } from 'aws-sdk/clients/signer';
 import FilterableDbService from '../../services/filterable-db.service.abstract';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 
 @Service()
 export default class UserService extends FilterableDbService<User> {
@@ -102,5 +103,20 @@ export default class UserService extends FilterableDbService<User> {
 
     }
 
+    public async Delete(key: string, value: string): Promise<AWS.Request<DynamoDB.DocumentClient.DeleteItemOutput, AWS.AWSError>> {
+        var params: DocumentClient.DeleteItemInput = {
+            TableName: this.TABLE_NAME,
+            Key: {
+                login: value
+            }
+        };
 
+        return this.docClient.delete(params, function (err, data) {
+            if (err) {
+                return err;
+            } else {
+                return data;
+            }
+        });
+    }
 }

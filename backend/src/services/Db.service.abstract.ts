@@ -46,7 +46,7 @@ export default abstract class DbService<T> {
         var params: DocumentClient.DeleteItemInput = {
             TableName: this.TABLE_NAME,
             Key: {
-                key: value
+                id: value
             }
         };
 
