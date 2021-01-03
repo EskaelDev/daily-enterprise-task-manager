@@ -5,8 +5,8 @@ export class Team {
     department: string;
     manager: string;
     Manager: User;
-    members: string[];
-    Members: User[];
+    members: string[] = [];
+    Members: User[] = [];
 
     static prepareToUpdate(team: Team) {
         return new Team({teamName: team.teamName, department: team.department, manager: team.manager, members: team.members});

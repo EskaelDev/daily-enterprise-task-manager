@@ -34,9 +34,4 @@ export class TeamsAdminComponent implements OnInit {
     this.isLoading = true;
     this.teamsService.loadAll();
   }
-
-  addNewTeam()
-  {
-
-  }
 }

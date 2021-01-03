@@ -20,6 +20,8 @@ import { TeamAdminComponent } from './teams-admin/team-admin/team-admin.componen
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { UsersComponent } from './users/users.component';
+import { NgxTypeaheadModule } from "ngx-typeahead";
+import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -45,7 +47,9 @@ import { UsersComponent } from './users/users.component';
     BrowserAnimationsModule,
     DragDropModule,
     ScrollingModule,
-    Ng2SearchPipeModule
+    Ng2SearchPipeModule,
+    NgxTypeaheadModule,
+    NgbTypeaheadModule
   ],
   providers: [],
   bootstrap: [AppComponent]
