@@ -203,15 +203,15 @@ export default class UsersController {
 
 
     @UseBefore(AuthMiddleware)
-    @Delete('/:id')
-    public async DeleteTask(@Param('taskId') id: string, @Res() res: Response, @HeaderParam("Authorization") token: string) {
+    @Delete('/:login')
+    public async Delete(@Param('login') login: string, @Res() res: Response, @HeaderParam("Authorization") token: string) {
         if (this.authService.NotAdmin(token)) {
 
             throw new UnauthorizedError();
         }
 
         let response: ApiResponse = await new Promise(async (result) => {
-            let request = await this.userService.Delete('id', id);
+            let request = await this.userService.Delete('login', login);
 
             request
                 .on('error', res => {

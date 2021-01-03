@@ -16,6 +16,7 @@ import FilterableDbService from '../../services/filterable-db.service.abstract';
 import Team from './team.interface';
 import User from '../users/user.interface';
 import UserService from '../users/user.service';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 
 @Service()
 export default class TeamService extends FilterableDbService<Team> {
@@ -58,5 +59,20 @@ export default class TeamService extends FilterableDbService<Team> {
     public async GetMember(userName:string):Promise<User>{
         return this.userService.GetUser(userName);
     }
+    public async Delete(key: string, value: string): Promise<AWS.Request<DynamoDB.DocumentClient.DeleteItemOutput, AWS.AWSError>> {
+        var params: DocumentClient.DeleteItemInput = {
+            TableName: this.TABLE_NAME,
+            Key: {
+                teamName: value
+            }
+        };
 
+        return this.docClient.delete(params, function (err, data) {
+            if (err) {
+                return err;
+            } else {
+                return data;
+            }
+        });
+    }
 }
