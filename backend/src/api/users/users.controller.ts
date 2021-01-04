@@ -288,10 +288,6 @@ export default class UsersController {
     @UseBefore(AuthMiddleware)
     @Put()
     public async UpdateUser(@Res() res: Response, @Body({ required: true }) user: User, @HeaderParam("Authorization") token: string) {
-        if (this.authService.NotAdmin(token)) {
-
-            throw new UnauthorizedError();
-        }
 
         let userDb: User = await new Promise(async (result) => {
             let request = await this.userService.GetUser(user.login);
