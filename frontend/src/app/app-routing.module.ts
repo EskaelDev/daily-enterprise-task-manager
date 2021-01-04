@@ -8,6 +8,7 @@ import { TeamComponent } from './teams/team/team.component';
 import { TeamsComponent } from './teams/teams.component';
 import { UsersComponent } from './users/users.component';
 import {TeamAdminComponent} from './teams-admin/team-admin/team-admin.component';
+import { WorkerTasksComponent } from './worker-tasks/worker-tasks.component';
 
 const routes: Routes = [
 {
@@ -64,7 +65,23 @@ const routes: Routes = [
                     component: TeamAdminComponent
                 }
             ]
-        }
+        },
+      {
+        path: 'tasks',
+        data: {
+          breadcrumb: 'My tasks'
+        },
+        component: WorkerTasksComponent,
+        // canActivate: [ AuthGuardService ]
+      },
+      {
+        path: 'users',
+        data: {
+          breadcrumb: 'Users'
+        },
+        component: UsersComponent,
+        canActivate: [ AuthGuardService ]
+      }
     ],
     canActivate: [ AuthGuardService ]
 },
@@ -90,13 +107,6 @@ const routes: Routes = [
         breadcrumb: null
     },
     component: LoginComponent
-},
-  {
-    path: 'users',
-    data: {
-      breadcrumb: 'Users'
-    },
-    component: UsersComponent
 }
 ];
 

@@ -1,1 +1,19 @@
-<p>worker-tasks works!</p>
+<div class="search">
+  <div class="team-des ml-2 mb-2">
+    <!--    <form [formGroup]="userTasksForm">-->
+    <div class="input-group loading">
+      <input class="form-control form-control-sm user-desc" id="user-task" type="text" formControlName="userTasks">
+      <!--        <span class="spinner-border spinner-border-sm ml-2"></span>-->
+    </div>
+    <!--        </form>-->
+  </div>
+  <div class="mr-3 pb-1 d-flex">
+    <select role="button" class="form-control form-control-sm dark-border mr-2" id="language">
+      <option value="0"> ENG</option>
+      <option value="1"> POL</option>
+      <option value="2"> GER</option>
+    </select>
+    <input class="form-control form-control-sm dark-border" id="searchInput" type="text" placeholder="Search..">
+<!--           [(ngModel)]="searchText">-->
+  </div>
+</div>

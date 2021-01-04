@@ -11,8 +11,11 @@ import { AuthService } from './auth.service';
 })
 export class TasksService {
   private _tasksByMembers = new BehaviorSubject<Map<string, Task[]>>(new Map());
-  private dataStore: { tasksByMembers: Map<string, Task[]>} = { tasksByMembers: new Map() };
+  private _tasksByUser = new BehaviorSubject<Task[]>([]);
+  private dataStore: { tasksByMembers: Map<string, Task[]>} = { tasksByMembers: new Map()};
+  private userDataStore: { tasksByUser: Task[]} = { tasksByUser: new Array()};
   readonly tasksByMembers = this._tasksByMembers.asObservable();
+  readonly tasksByUser = this._tasksByUser.asObservable();
   private _error = new BehaviorSubject<string>("");
   readonly error = this._error.asObservable();
 
@@ -36,6 +39,19 @@ export class TasksService {
           this.dataStore.tasksByMembers.set(userLogin, [t])
       });
       this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
+    }, error => this._error.next('Could not load tasks.'));
+  }
+
+  loadForUser(login: string){
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.post<any>(`${environment.apiUrl}/tasks/filter/`, {field: "login", value: login}, { headers: headers}).subscribe(data => {
+      this.userDataStore.tasksByUser = data.body.Items;
+      this._tasksByUser.next(Object.assign({}, this.userDataStore).tasksByUser);
     }, error => this._error.next('Could not load tasks.'));
   }
 
@@ -106,7 +122,7 @@ export class TasksService {
     this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').forEach((t, i) => {
           if (t.id === task.id) { this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').splice(i, 1); }
         });
-  
+
         this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
   }
 }

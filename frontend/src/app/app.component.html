@@ -13,6 +13,7 @@
             <a href="/users" class="nav-item nav-link" *ngIf="isAdmin">Users</a>
             <a href="/teams-admin" class="nav-item nav-link" *ngIf="isAdmin">Teams</a>
             <a href="/teams" class="nav-item nav-link" *ngIf="isManager">Teams</a>
+            <a href="/tasks" class="nav-item nav-link" *ngIf="isWorker">My tasks</a>
         </div>
         <div class="navbar-nav ml-auto">
             <a href="" class="nav-item nav-link" (click)="logout()">Logout</a>

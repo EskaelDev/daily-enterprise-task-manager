@@ -23,13 +23,17 @@ export class AppComponent implements OnInit {
     async ngOnInit() {
         this.currentUser = await this.authService.currentUserValue;
     }
-    
+
     get isAdmin() {
         return this.currentUser && Number(this.currentUser.userRole) === Role.Admin;
     }
 
     get isManager() {
         return this.currentUser && Number(this.currentUser.userRole) === Role.Manager;
+    }
+
+    get isWorker() {
+        return this.currentUser && Number(this.currentUser.userRole) === Role.Worker;
     }
 
     logout() {
