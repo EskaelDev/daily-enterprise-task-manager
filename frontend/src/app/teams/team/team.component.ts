@@ -105,6 +105,8 @@ export class TeamComponent implements OnInit {
                       this.alertService.error(error);
                       this.isLoading = false;
                       this.loadingDepartment = false;
+                      this.isLanguageLoading = false;
+                      this.isUpdating = false;
                     }
                   });
 
@@ -112,6 +114,8 @@ export class TeamComponent implements OnInit {
                     if (error !== "") {
                       this.alertService.error(error);
                       this.isLoading = false;
+                      this.isLanguageLoading = false;
+                      this.isUpdating = false;
                     }
                   });
         });

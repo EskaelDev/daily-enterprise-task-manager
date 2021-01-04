@@ -20,7 +20,7 @@
         <input class="form-control form-control-sm dark-border" id="searchInput" type="text" placeholder="Search.." [(ngModel)]="searchText">
     </div>
 </div>
-<div *ngIf="!isLoading" class="overflow-auto">
+<div *ngIf="!isLoading" [ngClass]="{show: !isLoading && !isUpdating, hide: isLoading || isUpdating}" class="overflow-auto">
     <div class="d-flex flex-row columns">
         <div class="card column-card ml-1 mr-1 dark-border" style="width: 18rem;">
             <div class="card-body pl-3 pt-2">
