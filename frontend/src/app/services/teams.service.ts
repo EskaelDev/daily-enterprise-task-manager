@@ -88,7 +88,6 @@ export class TeamsService {
     });
 
     let teamToUpdate = Team.prepareToUpdate(team);
-    console.log(JSON.stringify(teamToUpdate));
     this.http.post<Team>(`${environment.apiUrl}/teams/`, JSON.stringify(teamToUpdate), {headers: headers}).subscribe(() => {
       this.load(team.teamName);
     }, error => this._error.next('Could not update team.'));
@@ -115,6 +114,6 @@ export class TeamsService {
       });
 
       this._teams.next(Object.assign({}, this.dataStore).teams);
-    }, error => console.log('Could not delete team.'));
+    }, error => this._error.next('Could not delete team.'));
   }
 }
