@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { Task } from '../models/task';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from './auth.service';
+import { Language } from '../models/language.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -15,17 +16,19 @@ export class TasksService {
   readonly tasksByMembers = this._tasksByMembers.asObservable();
   private _error = new BehaviorSubject<string>("");
   readonly error = this._error.asObservable();
+  private sorter = (a: Task, b: Task) => a.priority - b.priority;
 
   constructor(private http: HttpClient, private authService: AuthService) { }
 
-  loadAll(teamName: string) {
+  loadAll(teamName: string, language: Language) {
     const token = this.authService.currentUserValue.token;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.post<any>(`${environment.apiUrl}/tasks/filter/`, {field: "teamName", value: teamName}, { headers: headers}).subscribe(data => {
+    this.http.post<any>(`${environment.apiUrl}/tasks/filter/`, {field: "teamName", value: teamName, language: `${language}`},
+      { headers: headers}).subscribe(data => {
       let tasks = data.body.Items;
       this.dataStore.tasksByMembers = new Map<string, Task[]>();
       tasks.forEach(t => {
@@ -35,6 +38,7 @@ export class TasksService {
         else
           this.dataStore.tasksByMembers.set(userLogin, [t])
       });
+      this.dataStore.tasksByMembers.forEach((val, key) => val.sort(this.sorter));
       this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
     }, error => this._error.next('Could not load tasks.'));
   }
@@ -58,24 +62,26 @@ export class TasksService {
   //   }, error => console.log('Could not load task.'));
   // }
 
-  create(task: Task) {
+  create(task: Task, language: Language) {
     const token = this.authService.currentUserValue.token;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    task.id = uuidv4();
+    let tasks = this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned');
 
-    this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned').push(task);
-    console.log(JSON.stringify(task));
+    task.id = uuidv4();
+    task.priority = tasks[tasks.length-1].priority+1;
+    tasks.push(task);
+    tasks.sort(this.sorter);
 
     this.http.post<Task>(`${environment.apiUrl}/tasks`, JSON.stringify(task), {headers: headers}).subscribe(data => {
-      this.loadAll(task.teamName);
+      this.loadAll(task.teamName, language);
     }, error => this._error.next('Could not create task.'));
   }
 
-  update(task: Task) {
+  update(task: Task, language: Language) {
     const token = this.authService.currentUserValue.token;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -84,11 +90,31 @@ export class TasksService {
 
     let taskToUpdate = Task.createToUpdate(task);
 
-    console.log(JSON.stringify(taskToUpdate));
-
     this.http.post<Task>(`${environment.apiUrl}/tasks`, JSON.stringify(taskToUpdate), {headers: headers}).subscribe(data => {
-      this.loadAll(task.teamName);
+      this.loadAll(task.teamName, language);
     }, error => this._error.next('Could not update task.'));
+  }
+
+  updatePriorities(userLogin: string) {
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.prepareTasksToUpdatePriority(userLogin)
+
+    let tasks = this.dataStore.tasksByMembers.get(userLogin);
+    if (tasks.length !== 0)
+    {
+        this.http.post<any>(`${environment.apiUrl}/tasks/updatepriority`, JSON.stringify(tasks), {headers: headers}).subscribe(data => {}, error => this._error.next('Could not update task.'));
+    }
+  }
+
+  private prepareTasksToUpdatePriority(userLogin: string)
+  {
+    let tasks = this.dataStore.tasksByMembers.get(userLogin);
+    tasks.forEach((val, idx) => val.priority = idx);
   }
 
   remove(task: Task) {

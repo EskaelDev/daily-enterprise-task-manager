@@ -12,6 +12,7 @@ export class Task {
     taskLanguage: Language;
     taskStatus: Status = Status.ToDo;
     taskDuration: number;
+    priority: number;
 
     constructor(init?:Partial<Task>) {
         Object.assign(this, init);
@@ -20,7 +21,7 @@ export class Task {
     static createToUpdate(task: Task) {
         return new Task({id: task.id, title: task.title, description: task.description.translation,
         tags: task.tags, userLogin: task.userLogin, teamName: task.teamName, taskLanguage: task.taskLanguage,
-        taskStatus: task.taskStatus, taskDuration: task.taskDuration});
+        taskStatus: task.taskStatus, taskDuration: task.taskDuration, priority: task.priority});
     }
 }
 
