@@ -100,11 +100,11 @@ export default class TasksController {
             for (let index = 0; index < response.body.Items.length; index++) {
                 let desc = response.body.Items[index].description;
                 desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(filter.language));
-                if (desc.successful) {
+                if (desc.successful)
+                {
                     response.body.Items[index].description = desc.translation.TranslatedText;
                     response.body.Items[index].taskLanguage = filter.language;
                 }
-                else throw new Error("Translation error");
 
                 if (response.body.Items[index].userLogin) {
                     response.body.Items[index]['User'] = await this.taskService.GetUser(response.body.Items[index].userLogin);
@@ -155,12 +155,8 @@ export default class TasksController {
             let user: User = this.authService.ExtractUserFromToken(jwt_decode(token));
             let desc = response.body.Item.description;
             desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(lang));
-            if (desc.successful) {
-                response.body.Item.description = desc.translation.TranslatedText;
-
-                return res.status(StatusCodes.OK).send(response);
-            }
-            else throw new Error("Translation error");
+            response.body.Item.description = desc.translation.TranslatedText;
+            return res.status(StatusCodes.OK).send(response);
         }
 
         throw new BadRequestError(response.body);
