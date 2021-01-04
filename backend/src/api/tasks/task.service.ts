@@ -35,6 +35,7 @@ export default class TaskService extends FilterableDbService<Task> {
                 task.taskLanguage = Language.ENG;
                 task.description = result.translation.TranslatedText;
             }
+            else throw new Error ("Translation error");
         }
 
         if (task.id == null) {
