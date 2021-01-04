@@ -86,6 +86,7 @@ export class TeamAdminComponent implements OnInit {
                     if (this.isUpdating && !this.isNewTeam)
                     {
                         this.isUpdating = false;
+                        this.isPosted = true;
                         this.alertService.success("Team successfully updated.");
                     } else if (this.isUpdating)
                     {
@@ -131,10 +132,6 @@ export class TeamAdminComponent implements OnInit {
     onCancelClicked()
     {
         this.router.navigate(["teams-admin"]);
-    }
-
-    public handleStaticResultSelected (result) {
-        console.log(result);
     }
 
     selectedManager(event, inputManager) {

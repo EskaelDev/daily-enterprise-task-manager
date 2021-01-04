@@ -72,7 +72,7 @@ export class TasksService {
     let tasks = this.dataStore.tasksByMembers.get(task.userLogin ? task.userLogin : 'unassigned');
 
     task.id = uuidv4();
-    task.priority = tasks[tasks.length-1].priority+1;
+    task.priority = tasks.length == 0 ? 1 : tasks[tasks.length-1].priority+1;
     tasks.push(task);
     tasks.sort(this.sorter);
 

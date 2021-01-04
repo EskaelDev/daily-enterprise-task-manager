@@ -69,11 +69,34 @@ export class TeamComponent implements OnInit {
                         this.tasksService.tasksByMembers.subscribe(tasksByMembers =>
                             {
                                 this.tasksByMembers = tasksByMembers;
+                                let setLanguage = true;
                                 this.team.Members.forEach(member => 
                                     {
                                         if (!this.tasksByMembers.has(member.login))
                                             this.tasksByMembers.set(member.login, []);
+                                        
+                                        if (this.isUpdating && this.tasksByMembers.get(member.login).length !== 0
+                                                    && setLanguage)
+                                        {
+                                            let tasks = this.tasksByMembers.get(member.login);
+                                            // changed languge corectlly
+                                            if (manager.userLanguage !== tasks[0].taskLanguage) {
+                                                this.userService.update(manager, tasks[0].taskLanguage).subscribe(
+                                                data => {
+                                                    this.authService.changeLanguage(tasks[0].taskLanguage);
+                                                    setLanguage = false;
+                                                },
+                                                error => {}
+                                            );}
+                                        }
                                     });
+
+                                // changing language is not possible
+                                if (this.isUpdating && setLanguage) {
+                                    this.teamLanguageControl.setValue(manager.userLanguage);
+                                    this.alertService.error("Can not change display language.");
+                                }
+
                                 if (!this.tasksByMembers.has('unassigned'))
                                     this.tasksByMembers.set('unassigned', []);
                                 this.isLoading = false;
@@ -135,7 +158,7 @@ export class TeamComponent implements OnInit {
 
         this.currentTaskForm = this.fb.group({
             title: [task.title ? task.title : '', Validators.required],
-            description: [task.description ? task.description.translation ? task.description.translation : task.description : ''], 
+            description: [task.description ? task.description : ''], 
             user: [task.userLogin ? task.userLogin : 'unassigned'],
             taskDuration: [task.taskDuration ? task.taskDuration : ''],
             taskStatus: [task.taskStatus]
@@ -219,15 +242,8 @@ export class TeamComponent implements OnInit {
         this.isLanguageLoading = true;
 
         if (currentUser.userLanguage !== language) {
-            this.userService.update(currentUser, language).subscribe(
-                data => {
-                    this.authService.changeLanguage(language);
-                    this.isUpdating = true;
-                    this.tasksService.loadAll(this.team.teamName, language);},
-                error => {
-                    this.teamLanguageControl.setValue(currentUser.userLanguage);
-                    this.alertService.error("Can not change display language.");} 
-            );
+            this.isUpdating = true;
+            this.tasksService.loadAll(this.team.teamName, language);
         }
     }
 
