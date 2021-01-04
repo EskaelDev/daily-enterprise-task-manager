@@ -10,6 +10,7 @@ export default interface Task {
     taskLanguage: Language;
     taskStatus: Status;
     taskDuration: number;
+    priority:number;
 
 }
 
