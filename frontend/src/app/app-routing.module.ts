@@ -22,6 +22,18 @@ const routes: Routes = [
             component: HomeComponent
         },
         {
+            path: 'users',
+            data: {
+                breadcrumb: 'Users'
+            },
+            children: [
+                {
+                    path: '',
+                    component: UsersComponent
+                }
+            ]
+        },
+        {
             path: 'teams',
             data: {
                 breadcrumb: 'Teams'

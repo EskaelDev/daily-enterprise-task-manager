@@ -6,6 +6,7 @@ import { User } from '../models/user';
 import { map } from 'rxjs/operators';
 import { UserService } from './user.service';
 import jwt_decode from "jwt-decode";
+import { Language } from '../models/language.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -41,5 +42,12 @@ export class AuthService {
         localStorage.removeItem('currentUser');
         this.currentUserSubject.next(null);
         this.router.navigate([redirect]);
+    }
+
+    changeLanguage(language: Language){
+        let user = this.currentUserValue;
+        user.userLanguage = language;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.currentUserSubject.next(user);
     }
 }

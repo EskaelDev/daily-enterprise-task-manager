@@ -9,15 +9,18 @@
         </form>
     </div>
     <div class="mr-3 pb-1 d-flex">
-        <select role="button" class="form-control form-control-sm dark-border mr-2" id="language" [formControl]="teamLanguageControl">
-            <option value="0"> ENG </option>
-            <option value="1"> POL </option>
-            <option value="2"> GER </option>
-        </select>
+        <div class="input-group loading">
+            <span *ngIf="isLanguageLoading" class="spinner-border spinner-border-sm mr-2"></span>
+            <select role="button" class="form-control form-control-sm dark-border mr-2" id="language" [formControl]="teamLanguageControl">
+                <option value="0"> ENG </option>
+                <option value="1"> POL </option>
+                <option value="2"> GER </option>
+            </select>
+        </div>
         <input class="form-control form-control-sm dark-border" id="searchInput" type="text" placeholder="Search.." [(ngModel)]="searchText">
     </div>
 </div>
-<div *ngIf="!isLoading" class="overflow-auto">
+<div *ngIf="!isLoading" [ngClass]="{show: !isLoading && !isUpdating, hide: isLoading || isUpdating}" class="overflow-auto">
     <div class="d-flex flex-row columns">
         <div class="card column-card ml-1 mr-1 dark-border" style="width: 18rem;">
             <div class="card-body pl-3 pt-2">
@@ -73,7 +76,7 @@
         </div>
     </div>
 </div>
-<div *ngIf="isLoading" class="d-flex justify-content-center" style="margin-top: 10%;">
+<div id="loadingoverlay" *ngIf="isLoading || isUpdating" class="d-flex justify-content-center" style="margin-top: 10%;">
     <div class="spinner-grow text-dark" style="width: 5rem; height: 5rem;" role="status">
       <span class="sr-only">Loading...</span>
     </div>

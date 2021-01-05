@@ -101,7 +101,10 @@ export default class TasksController {
                 let desc = response.body.Items[index].description;
                 desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(filter.language));
                 if (desc.successful)
+                {
                     response.body.Items[index].description = desc.translation.TranslatedText;
+                    response.body.Items[index].taskLanguage = filter.language;
+                }
 
                 if (response.body.Items[index].userLogin) {
                     response.body.Items[index]['User'] = await this.taskService.GetUser(response.body.Items[index].userLogin);
@@ -119,7 +122,7 @@ export default class TasksController {
 
 
     @UseBefore(AuthMiddleware)
-    @Get('/:taskId/:lang')
+    @Get('/:taskId')
     public async GetById(@Res() res: Response, @Param('taskId') taskId: string, @Param('taskId') lang: Language, @HeaderParam("Authorization") token: string) {
         let response: ApiResponse = await new Promise(async (result) => {
             let request = await this.taskService.GetByKey(taskId);
@@ -202,5 +205,65 @@ export default class TasksController {
         }
         throw new NotFoundError(response.body);
 
+    }
+
+
+
+    @UseBefore(AuthMiddleware)
+    @Post('/updatepriority')
+    public async UpdatePriority(@Res() res: Response, @Body({ required: true }) tasks: Task[], @HeaderParam("Authorization") token: string) {
+        if (this.authService.NotAdmin(token) && this.authService.NotManager(token)) {
+
+            throw new UnauthorizedError();
+        }
+        let response: any;
+
+        for (let index = 0; index < tasks.length; index++) {
+            response = await this.updateTask(tasks[index])
+            if (response.successful) {
+                continue;
+            }
+            else {
+                throw new BadRequestError(response.body);
+            }
+        }
+
+        if ((response as ApiResponse)?.successful) {
+            return res.status(StatusCodes.OK).send(response);
+        }
+        throw new BadRequestError(response.body);
+
+    }
+
+    private async updateTask(task: Task) {
+
+        let response: ApiResponse = await new Promise(async (result) => {
+            let request = await this.taskService.Put(task);
+
+            request
+                .on('error', res => {
+                    let response: ApiResponse = {
+                        successful: false,
+                        caller: {
+                            class: 'TaskController',
+                            method: 'updateTask'
+                        },
+                        body: res.message
+                    }
+                    result(response)
+                })
+                .on('success', res => {
+                    let response: ApiResponse = {
+                        successful: true,
+                        caller: {
+                            class: 'TaskController',
+                            method: 'updateTask'
+                        },
+                        body: res.data
+                    }
+                    result(response)
+                });
+        });
+        return response
     }
 }

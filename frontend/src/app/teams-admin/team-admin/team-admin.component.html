@@ -11,7 +11,10 @@
             </div>
             <div class="col">
                 <label for="teamDepartment">Team department</label>
-                <input type="text" class="form-control form-control-sm dark-border" formControlName="department" [readonly]="isPosted">
+                <input type="text" class="form-control form-control-sm dark-border" formControlName="department" [readonly]="isPosted" [ngClass]="{ 'is-invalid': submitted && f.department.errors }">
+                <div *ngIf="submitted && f.department.errors" class="invalid-feedback">
+                    <div *ngIf="f.department.errors.required">department name is required</div>
+                </div>
             </div>
         </div>
         <div class="row mt-3">
@@ -61,7 +64,7 @@
         <div class="d-flex" style="justify-content: flex-end;">
             <button *ngIf="!isPosted" type="button" (click)="onCancelClicked()" class="btn btn-outline-secondary btn-sm mr-2" style="align-self: flex-end;">Cancel</button>
             <button *ngIf="isPosted" type="button" (click)="onCancelClicked()" class="btn btn-outline-secondary btn-sm mr-2" style="align-self: flex-end;">Back to teams</button>
-            <button *ngIf="!isNewTeam && !isPosted" type="button" (click)="onDeleteClicked()" class="btn btn-outline-danger btn-sm mr-2" style="align-self: flex-end;" disabled>Delete
+            <button *ngIf="!isNewTeam && !isPosted" type="button" (click)="onDeleteClicked()" class="btn btn-outline-danger btn-sm mr-2" style="align-self: flex-end;">Delete
                 <span *ngIf="isDeleting" class="spinner-border spinner-border-sm mr-1 ml-3"></span></button>
             <button *ngIf="!isPosted" type="submit" (click)="onSaveClicked()" class="btn btn-outline-info btn-sm mr-2" style="align-self: flex-end;">Save team 
                 <span *ngIf="isUpdating" class="spinner-border spinner-border-sm mr-1 ml-3"></span></button>

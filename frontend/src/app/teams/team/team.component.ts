@@ -12,6 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { AlertService } from 'src/app/services/alert.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-team',
@@ -34,6 +35,9 @@ export class TeamComponent implements OnInit {
     submitted = false;
     loadingDepartment = false;
     isLoading = true;
+    isLanguageLoading = false;
+    isUpdating = false;
+
     searchText;
 
     @ViewChild('modalCloseButton') modalCloseButton;
@@ -45,7 +49,8 @@ export class TeamComponent implements OnInit {
 
     constructor(private authService: AuthService, private tasksService: TasksService, 
         private teamsService: TeamsService, private fb: FormBuilder, private route: ActivatedRoute,
-        private cdRef: ChangeDetectorRef, private alertService: AlertService) { }
+        private cdRef: ChangeDetectorRef, private alertService: AlertService,
+        private userService: UserService) { }
 
     ngAfterViewChecked() {
         this.cdRef.detectChanges();
@@ -64,16 +69,43 @@ export class TeamComponent implements OnInit {
                         this.tasksService.tasksByMembers.subscribe(tasksByMembers =>
                             {
                                 this.tasksByMembers = tasksByMembers;
+                                let setLanguage = true;
                                 this.team.Members.forEach(member => 
                                     {
                                         if (!this.tasksByMembers.has(member.login))
                                             this.tasksByMembers.set(member.login, []);
+                                        
+                                        if (this.isUpdating && this.tasksByMembers.get(member.login).length !== 0
+                                                    && setLanguage)
+                                        {
+                                            let tasks = this.tasksByMembers.get(member.login);
+                                            // changed languge corectlly
+                                            if (manager.userLanguage !== tasks[0].taskLanguage) {
+                                                this.userService.update(manager, tasks[0].taskLanguage).subscribe(
+                                                data => {
+                                                    this.authService.changeLanguage(tasks[0].taskLanguage);
+                                                    setLanguage = false;
+                                                },
+                                                error => {}
+                                            );}
+                                        }
                                     });
+
+                                // changing language is not possible
+                                if (this.isUpdating && setLanguage) {
+                                    this.teamLanguageControl.setValue(manager.userLanguage);
+                                    this.alertService.error("Can not change display language.");
+                                }
+
+                                if (!this.tasksByMembers.has('unassigned'))
+                                    this.tasksByMembers.set('unassigned', []);
                                 this.isLoading = false;
+                                this.isLanguageLoading = false;
+                                this.isUpdating = false;
                             }
                         );
                         this.isLoading = true;
-                        this.tasksService.loadAll(this.team.teamName);
+                        this.tasksService.loadAll(this.team.teamName, manager.userLanguage);
 
                         this.teamLanguageControl = new FormControl(manager.userLanguage);
         
@@ -96,6 +128,8 @@ export class TeamComponent implements OnInit {
                       this.alertService.error(error);
                       this.isLoading = false;
                       this.loadingDepartment = false;
+                      this.isLanguageLoading = false;
+                      this.isUpdating = false;
                     }
                   });
 
@@ -103,6 +137,8 @@ export class TeamComponent implements OnInit {
                     if (error !== "") {
                       this.alertService.error(error);
                       this.isLoading = false;
+                      this.isLanguageLoading = false;
+                      this.isUpdating = false;
                     }
                   });
         });
@@ -122,7 +158,7 @@ export class TeamComponent implements OnInit {
 
         this.currentTaskForm = this.fb.group({
             title: [task.title ? task.title : '', Validators.required],
-            description: [task.description ? task.description.translation ? task.description.translation : task.description : ''], 
+            description: [task.description ? task.description : ''], 
             user: [task.userLogin ? task.userLogin : 'unassigned'],
             taskDuration: [task.taskDuration ? task.taskDuration : ''],
             taskStatus: [task.taskStatus]
@@ -179,7 +215,8 @@ export class TeamComponent implements OnInit {
                 this.tmpTags.forEach(t => task.tags.push(t.value));
                 task.taskDuration = this.currentTaskForm.get('taskDuration').value;
                 task.taskStatus = this.currentTaskForm.get('taskStatus').value;
-                this.tasksService.update(task);
+                task.taskLanguage = this.teamLanguageControl.value;
+                this.tasksService.update(task, this.teamLanguageControl.value);
             } else {
                 const nTask = new Task({
                     title: this.currentTaskForm.get('title').value, 
@@ -189,10 +226,11 @@ export class TeamComponent implements OnInit {
                     tags: [], 
                     taskDuration: this.currentTaskForm.get('taskDuration').value,
                     teamName: this.team.teamName,
-                    taskStatus: this.currentTaskForm.get('taskStatus').value
+                    taskStatus: this.currentTaskForm.get('taskStatus').value,
+                    taskLanguage: this.teamLanguageControl.value
                 });
                 this.tmpTags.forEach(t => nTask.tags.push(t.value));
-                this.tasksService.create(nTask);
+                this.tasksService.create(nTask, this.teamLanguageControl.value);
             }
             this.modalCloseButton.nativeElement.click();
         }
@@ -200,7 +238,13 @@ export class TeamComponent implements OnInit {
 
     onLanguageChange(language: Language)
     {
-        this.tasksService.loadAll(this.team.teamName); // TODO
+        let currentUser = this.authService.currentUserValue;
+        this.isLanguageLoading = true;
+
+        if (currentUser.userLanguage !== language) {
+            this.isUpdating = true;
+            this.tasksService.loadAll(this.team.teamName, language);
+        }
     }
 
     onTeamDepartmentChange()
@@ -229,6 +273,7 @@ export class TeamComponent implements OnInit {
     drop(event: CdkDragDrop<Task[]>) {
         if (event.previousContainer === event.container) {
           moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+          this.tasksService.updatePriorities(event.container.id);
         } else {
             transferArrayItem(event.previousContainer.data,
                 event.container.data,
@@ -236,7 +281,10 @@ export class TeamComponent implements OnInit {
                 event.currentIndex);
             let task = event.container.data[event.currentIndex];
             task.userLogin = event.container.id === "unassigned" ? null : event.container.id;
-            this.tasksService.update(task);
+            this.isUpdating = true;
+            this.tasksService.update(task, this.teamLanguageControl.value);
+            this.tasksService.updatePriorities(event.previousContainer.id);
+            this.tasksService.updatePriorities(event.container.id);
         }
     }
 
