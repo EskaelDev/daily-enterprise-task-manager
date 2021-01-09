@@ -1,4 +1,5 @@
 import AWS, { Translate } from "aws-sdk";
+import { ServiceConfigurationOptions } from "aws-sdk/lib/service";
 import { Service } from "typedi";
 import { Language } from "../../enums/languages.enum";
 
@@ -6,9 +7,15 @@ import { Language } from "../../enums/languages.enum";
 export default class TranslationService {
 
     private translator: AWS.Translate;
+    serviceConfigOptions: ServiceConfigurationOptions;
 
     constructor() {
-        this.translator = new AWS.Translate({ apiVersion: '2017-07-01' });
+        this.serviceConfigOptions = {
+            region: process.env.aws_region,
+            endpoint: process.env.aws_translator_endpoint
+        };
+        AWS.config.update(this.serviceConfigOptions);
+        this.translator = new AWS.Translate();
     }
 
     public async Translate(text: string, from: string, to: string): Promise<AWS.Request<Translate.TranslateTextResponse, AWS.AWSError>> {
@@ -19,8 +26,10 @@ export default class TranslationService {
             Text: text, /* required */
         };
         return this.translator.translateText(params, function (err, data) {
-            if (err) return err
-            else return data;
+            if (err)
+                return err
+            else
+                return data;
         });
 
     }

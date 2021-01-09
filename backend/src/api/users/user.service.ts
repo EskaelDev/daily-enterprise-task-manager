@@ -23,16 +23,23 @@ export default class UserService extends FilterableDbService<User> {
         super('Users', ["login", "userRole", "userName", "surname", "userLanguage"]);
 
     }
-    public async Put(user: User): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
-        user.password = await new Promise<string>((result) => {
+    public async Put(user: User, newPassword: boolean = false): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
+        if (newPassword)
+            user.password = await new Promise<string>((result) => {
 
-            crypto.pbkdf2(user.password, process.env.salt || '', 100000, 64, 'sha512', (err, derivedKey) => {
-                if (err) throw err;
+                crypto.pbkdf2(user.password, process.env.salt || '', 100000, 64, 'sha512', (err, derivedKey) => {
+                    if (err) throw err;
 
-                result(derivedKey.toString('hex'));
+                    result(derivedKey.toString('hex'));
+                });
+            }).catch(error => { console.log(error.message); return '' });
+        else {
+            let userDb: User = await new Promise(async (result) => {
+                let request = await this.GetUser(user.login);
+                result(request)
             });
-        }).catch(error => { console.log(error.message); return '' });
-
+            user.password = userDb.password;
+        }
         const params: DynamoCreateModel = {
             TableName: this.TABLE_NAME,
             Item: user
