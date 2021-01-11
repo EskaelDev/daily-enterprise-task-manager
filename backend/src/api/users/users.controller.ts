@@ -296,11 +296,9 @@ export default class UsersController {
 
         if(user==null)
             throw new NotFoundError();
-            
-        user.password = userDb.password;
-
+        let newPass = user.password!='';
         let response: ApiResponse = await new Promise(async (result) => {
-            let request = await this.userService.Put(user);
+            let request = await this.userService.Put(user, newPass);
 
             request
                 .on('error', res => {

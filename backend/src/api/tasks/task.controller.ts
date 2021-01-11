@@ -12,11 +12,14 @@ import { ReasonPhrases, StatusCodes, getReasonPhrase, getStatusCode, } from 'htt
 import User from "../users/user.interface";
 import TranslationService from "./translation.service";
 import { Language } from "../../enums/languages.enum";
+import SnsService from "../../services/sns.service";
+import { ok } from "assert";
 @JsonController("/tasks")
 export default class TasksController {
 
     constructor(private taskService: TaskService,
         private authService: AuthService,
+        private snsService: SnsService,
         private translationService: TranslationService) {
 
     }
@@ -63,6 +66,14 @@ export default class TasksController {
         }
         throw new BadRequestError(response.body);
 
+    }
+
+    
+    @UseBefore(AuthMiddleware)
+    @Post('/remind')
+    public async Remind(@Res() res: Response, @Body({ required: false }) message: {message:string}, @HeaderParam("Authorization") token: string) {
+        this.snsService.Send(message.message);
+        return res.status(StatusCodes.OK);
     }
 
     @UseBefore(AuthMiddleware)
@@ -266,4 +277,7 @@ export default class TasksController {
         });
         return response
     }
+
+    
+
 }

@@ -13,6 +13,7 @@ import { map } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { AlertService } from 'src/app/services/alert.service';
 import { UserService } from 'src/app/services/user.service';
+import { error } from 'jquery';
 
 @Component({
   selector: 'app-team',
@@ -70,6 +71,7 @@ export class TeamComponent implements OnInit {
                             {
                                 this.tasksByMembers = tasksByMembers;
                                 let setLanguage = true;
+                                let isUserLanguageUpdating = false;
                                 this.team.Members.forEach(member => 
                                     {
                                         if (!this.tasksByMembers.has(member.login))
@@ -81,18 +83,22 @@ export class TeamComponent implements OnInit {
                                             let tasks = this.tasksByMembers.get(member.login);
                                             // changed languge corectlly
                                             if (manager.userLanguage !== tasks[0].taskLanguage) {
+                                                isUserLanguageUpdating = true;
                                                 this.userService.update(manager, tasks[0].taskLanguage).subscribe(
                                                 data => {
                                                     this.authService.changeLanguage(tasks[0].taskLanguage);
                                                     setLanguage = false;
                                                 },
-                                                error => {}
+                                                error => {
+                                                    this.teamLanguageControl.setValue(manager.userLanguage);
+                                                    this.alertService.error("Can not change display language.");
+                                                }
                                             );}
                                         }
                                     });
 
                                 // changing language is not possible
-                                if (this.isUpdating && setLanguage) {
+                                if (this.isLanguageLoading && setLanguage && !isUserLanguageUpdating) {
                                     this.teamLanguageControl.setValue(manager.userLanguage);
                                     this.alertService.error("Can not change display language.");
                                 }
@@ -196,7 +202,13 @@ export class TeamComponent implements OnInit {
 
     notifyClickedTask()
     {
-        // TODO make notifying
+        this.tasksService.notify(this.clickedTask.value).subscribe(
+            data => { this.closeModal(); },
+            error => {
+                this.alertService.success("Successfully notified!");
+                this.closeModal();
+            }
+        );
     }
 
     onSave()

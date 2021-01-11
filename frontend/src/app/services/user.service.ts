@@ -10,7 +10,6 @@ import { User } from '../models/user';
   providedIn: 'root'
 })
 export class UserService {
-  authService: any;
   constructor(private http: HttpClient) { }
 
   getAllWithRole(currUserToken: string, userRole: Role) {
