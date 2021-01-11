@@ -12,9 +12,7 @@ import {User} from "../models/user";
 })
 export class HomeComponent implements OnInit {
   currentUser: User;
-  faTrash = faTrash;
   faEdit = faEdit;
-  faBell = faBell;
   faTasks = faTasks;
   faUserCog = faUserCog;
   faUser = faUser;
