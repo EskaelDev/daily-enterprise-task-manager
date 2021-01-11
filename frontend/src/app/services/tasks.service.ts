@@ -132,4 +132,16 @@ export class TasksService {
       this._tasksByMembers.next(Object.assign({}, this.dataStore).tasksByMembers);
     }, error => this._error.next('Could not delete task.'));
   }
+
+  notify(task: Task)
+  {
+    const token = this.authService.currentUserValue.token;
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post<any>(`${environment.apiUrl}/tasks/remind`, {"message": `Kindly remind about your task to finish today. Task info: 
+    Title: ${task.title}, Task description: ${task.description}, Team: ${task.teamName}, Assigned: ${task.userLogin}`}, {headers: headers});
+  }
 }

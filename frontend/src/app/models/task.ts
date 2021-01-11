@@ -4,7 +4,7 @@ import { User } from "./user";
 export class Task {
     id?: number;
     title: string;
-    description: string;
+    description: string = "";
     tags: string[] = [];
     userLogin?: string;
     User: User;
@@ -19,7 +19,7 @@ export class Task {
     }
 
     static createToUpdate(task: Task) {
-        return new Task({id: task.id, title: task.title, description: task.description,
+        return new Task({id: task.id, title: task.title, description: task.description ? task.description : "",
         tags: task.tags, userLogin: task.userLogin, teamName: task.teamName, taskLanguage: task.taskLanguage,
         taskStatus: task.taskStatus, taskDuration: task.taskDuration, priority: task.priority});
     }
