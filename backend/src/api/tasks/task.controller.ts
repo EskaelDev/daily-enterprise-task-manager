@@ -28,8 +28,8 @@ export default class TasksController {
     @UseBefore(AuthMiddleware)
     @Post()
     public async AddTask(@Res() res: Response, @Body({ required: true }) task: Task, @HeaderParam("Authorization") token: string) {
-        if (this.authService.NotAdmin(token) && this.authService.NotManager(token)) {
-
+        if (this.authService.NotAdmin(token) && this.authService.NotManager(token) && this.authService.NotWorker(token)) {
+        
             throw new UnauthorizedError();
         }
 

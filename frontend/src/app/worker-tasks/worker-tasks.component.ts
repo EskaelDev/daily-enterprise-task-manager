@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
-import { CommonModule } from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {BehaviorSubject} from 'rxjs';
 import {Language} from '../models/language.enum';
 import {Task} from '../models/task';
@@ -10,7 +10,7 @@ import {AlertService} from '../services/alert.service';
 import {AuthService} from '../services/auth.service';
 import {TasksService} from '../services/tasks.service';
 import {UserService} from '../services/user.service';
-import { faTrash, faEdit, faBell } from '@fortawesome/free-solid-svg-icons';
+import {faTrash, faEdit, faBell} from '@fortawesome/free-solid-svg-icons';
 import {CdkDragDrop, moveItemInArray, transferArrayItem} from "@angular/cdk/drag-drop";
 import {any} from "codelyzer/util/function";
 import {Team} from "../models/team";
@@ -24,7 +24,6 @@ export class WorkerTasksComponent implements OnInit {
 
   user: User;
   tasksByUser: Task[];
-  userTeams: Task[];
   clickedTask: BehaviorSubject<Task> = new BehaviorSubject<Task>(new Task());
   currentTaskForm: FormGroup;
 
@@ -38,8 +37,6 @@ export class WorkerTasksComponent implements OnInit {
   userLanguageControl: FormControl;
 
   faTrash = faTrash;
-  faEdit = faEdit;
-  faBell = faBell;
 
   wasTrashClicked = false;
   wasNotifyClicked = false;
@@ -53,41 +50,63 @@ export class WorkerTasksComponent implements OnInit {
   ngOnInit(): void {
     this.user = this.authService.currentUserValue;
 
+
     this.tasksService.tasksByUser.subscribe(
       data => {
         this.tasksByUser = data;
+        let setLanguage = true;
+        let isUserLanguageUpdating = false;
+
+        if (this.isUpdating && this.tasksByUser.length !== 0 && setLanguage) {
+
+          // changed languge corectlly
+          let tasks = this.tasksByUser;
+          if (this.user.userLanguage !== tasks[0].taskLanguage) {
+            isUserLanguageUpdating = true;
+            this.userService.update(this.user, tasks[0].taskLanguage).subscribe(
+              data => {
+                this.authService.changeLanguage(tasks[0].taskLanguage);
+                setLanguage = false;
+              },
+              error => {
+                this.userLanguageControl.setValue(this.user.userLanguage);
+                this.alertService.error("Can not change display language.");
+              }
+            );
+          }
+
+        }
+        if (this.isLanguageLoading && setLanguage && !isUserLanguageUpdating) {
+          this.userLanguageControl.setValue(this.user.userLanguage);
+          this.alertService.error("Can not change display language.");
+        }
         this.isLoading = false;
+        this.isLanguageLoading = false;
+        this.isUpdating = false;
       }
     );
 
-    this.tasksService.error.subscribe(error => {
-      if (error !== "") {
-        this.alertService.error(error);
-        this.isLoading = false;
-        this.isLanguageLoading = false;
-      }
-    });
-
     this.isLoading = true;
     this.tasksService.loadForUser(this.user.login, this.user.userLanguage);
-    this.getUsersTeams();
 
     this.userLanguageControl = new FormControl(this.user.userLanguage);
 
     this.userLanguageControl.valueChanges.subscribe((language: any) => {
       this.onLanguageChange(language);
     });
+
+    this.catchError();
   }
 
   onLanguageChange(language: Language) {
-      let currentUser = this.authService.currentUserValue;
-      this.isLanguageLoading = true;
+    let currentUser = this.authService.currentUserValue;
+    this.isLanguageLoading = true;
 
-      if (currentUser.userLanguage !== language) {
-        this.isUpdating = true;
-        this.tasksService.loadForUser(this.user.login, language);
-      }
+    if (currentUser.userLanguage !== language) {
+      this.isUpdating = true;
+      this.tasksService.loadForUser(this.user.login, language);
     }
+  }
 
   drop(event: CdkDragDrop<Task[]>) {
     if (event.previousContainer === event.container) {
@@ -100,30 +119,28 @@ export class WorkerTasksComponent implements OnInit {
         event.currentIndex);
       let task = event.container.data[event.currentIndex];
       task.userLogin = event.container.id === "unassigned" ? null : event.container.id;
-      // this.isUpdating = true;
-      // this.tasksService.update(task, this.teamLanguageControl.value);
+      this.isUpdating = true;
+      this.tasksService.update(task, this.userLanguageControl.value);
       this.tasksService.updatePriorities(event.previousContainer.id);
       this.tasksService.updatePriorities(event.container.id);
     }
   }
 
-  onTaskClicked(userLogin: string, taskId: number)
-  {
+  onTaskClicked(userLogin: string, taskId: number) {
     this.clickedTask.next(this.tasksByUser.find(task => task.id === taskId));
     this.setCurrentForm();
   }
 
-  setCurrentForm()
-  {
+  setCurrentForm() {
     const task = this.clickedTask.value;
 
     this.currentTaskForm = this.fb.group({
-      title: [task.title ? task.title : '', Validators.required],
-      description: [task.description ? task.description : ''],
-      user: [task.userLogin ? task.userLogin : 'unassigned'],
+      title: [{value: (task.title ? task.title : ''), disabled: true}, Validators.required],
+      description: [{value: task.description ? task.description : '', disabled: true}],
+      user: [{value: task.userLogin ? task.userLogin : 'unassigned', disabled: true}],
       taskDuration: [task.taskDuration ? task.taskDuration : ''],
       taskStatus: [task.taskStatus],
-      teamName: [task.teamName ? task.teamName : '', Validators.required]
+      teamName: [{value: task.teamName ? task.teamName : '', disabled: true}, Validators.required]
     });
 
     this.tmpTags = [];
@@ -131,27 +148,15 @@ export class WorkerTasksComponent implements OnInit {
     task.tags.forEach(t => this.tmpTags.push({display: t, value: t}));
   }
 
-  onTrashClicked()
-  {
+  onTrashClicked() {
     this.wasTrashClicked = true;
   }
 
-  onNotifyClicked()
-  {
-    this.wasNotifyClicked = true;
+  get f() {
+    return this.currentTaskForm.controls;
   }
 
-  addTask(userLogin?: string)
-  {
-    this.clickedTask.next(new Task({userLogin: userLogin}));
-    this.setCurrentForm();
-  }
-
-  get f() { return this.currentTaskForm.controls; }
-
-
-  closeModal()
-  {
+  closeModal() {
     this.wasTrashClicked = false;
     this.wasNotifyClicked = false;
     this.clickedTask.next(null);
@@ -160,20 +165,19 @@ export class WorkerTasksComponent implements OnInit {
 
   onSave() {
     this.submitted = true;
-    if (this.currentTaskForm.valid)
-    {
+    if (this.currentTaskForm.valid) {
       let task = this.clickedTask.value;
-      if (task.id)
-      {
+      if (task.id) {
         task.title = this.currentTaskForm.get('title').value;
         task.description = this.currentTaskForm.get('description').value;
         task.userLogin = this.currentTaskForm.get('user').value === "unassigned" ? null :
-          this.currentTaskForm.get('user').value;
+          this.currentTaskForm.get('user').value,
         task.tags = [];
         this.tmpTags.forEach(t => task.tags.push(t.value));
         task.taskDuration = this.currentTaskForm.get('taskDuration').value;
         task.taskStatus = this.currentTaskForm.get('taskStatus').value;
         task.taskLanguage = this.userLanguageControl.value;
+        task.teamName = this.currentTaskForm.get('teamName').value;
         this.tasksService.update(task, this.userLanguageControl.value);
       } else {
         const nTask = new Task({
@@ -194,12 +198,19 @@ export class WorkerTasksComponent implements OnInit {
     }
   }
 
-  getUsersTeams(){
-    this.userTeams = this.tasksByUser.filter(task => task.teamName);
-  }
-  deleteClickedTask()
-  {
+  deleteClickedTask() {
     this.tasksService.remove(this.clickedTask.value);
     this.closeModal();
+  }
+
+  catchError(){
+    this.tasksService.error.subscribe(error => {
+      if (error !== "") {
+        this.alertService.error(error);
+        this.isLoading = false;
+        this.isLanguageLoading = false;
+        this.isUpdating = false;
+      }
+    });
   }
 }

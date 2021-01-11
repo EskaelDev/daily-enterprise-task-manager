@@ -59,25 +59,6 @@ export class TasksService {
     }, error => this._error.next('Could not load tasks.'));
   }
 
-  // load(id: number | string) {
-  //   this.http.get<Task>(`${environment.apiUrl}/tasks/${id}`).subscribe(data => {
-  //     let notFound = true;
-
-  //     this.dataStore.tasksByMembers.forEach((item, index) => {
-  //       if (item.id === data.id) {
-  //         this.dataStore.tasks[index] = data;
-  //         notFound = false;
-  //       }
-  //     });
-
-  //     if (notFound) {
-  //       this.dataStore.tasks.push(data);
-  //     }
-
-  //     this._tasks.next(Object.assign({}, this.dataStore).tasks);
-  //   }, error => console.log('Could not load task.'));
-  // }
-
   create(task: Task, language: Language) {
     const token = this.authService.currentUserValue.token;
     const headers = new HttpHeaders({
