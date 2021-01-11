@@ -1,4 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { TagInputModule } from 'ngx-chips';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
@@ -22,6 +23,7 @@ import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { UsersComponent } from './users/users.component';
 import { NgxTypeaheadModule } from "ngx-typeahead";
 import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import {WorkerTasksComponent} from "./worker-tasks/worker-tasks.component";
 
 @NgModule({
   declarations: [
@@ -34,10 +36,12 @@ import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
     TeamsComponent,
     TeamsAdminComponent,
     TeamAdminComponent,
-    UsersComponent
+    UsersComponent,
+    WorkerTasksComponent
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,

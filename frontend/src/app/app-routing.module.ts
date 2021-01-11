@@ -84,14 +84,6 @@ const routes: Routes = [
           breadcrumb: 'My tasks'
         },
         component: WorkerTasksComponent,
-        // canActivate: [ AuthGuardService ]
-      },
-      {
-        path: 'users',
-        data: {
-          breadcrumb: 'Users'
-        },
-        component: UsersComponent,
         canActivate: [ AuthGuardService ]
       }
     ],

@@ -46,14 +46,14 @@ export class TasksService {
     }, error => this._error.next('Could not load tasks.'));
   }
 
-  loadForUser(login: string){
+  loadForUser(login: string, language: Language){
     const token = this.authService.currentUserValue.token;
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.post<any>(`${environment.apiUrl}/tasks/filter/`, {field: "login", value: login}, { headers: headers}).subscribe(data => {
+    this.http.post<any>(`${environment.apiUrl}/tasks/filter/`, {field: "userLogin", value: login, language: `${language}`}, { headers: headers}).subscribe(data => {
       this.userDataStore.tasksByUser = data.body.Items;
       this._tasksByUser.next(Object.assign({}, this.userDataStore).tasksByUser);
     }, error => this._error.next('Could not load tasks.'));
