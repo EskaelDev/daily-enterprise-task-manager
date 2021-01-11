@@ -12,7 +12,7 @@
 
 .user-task {
   border: none;
-  background-color: rgba(0,0,0,0) !important;
+  background-color: rgba(0, 0, 0, 0) !important;
 }
 
 .columns {
@@ -25,18 +25,23 @@
   flex-wrap: wrap;
 }
 
-.task-card{
+.task-box {
+  flex: auto;
+  text-align: -webkit-center;
+}
+
+.task-card {
   background: rgb(56 61 63 / 47%);
 }
 
-.column-card{
+.column-card {
   background: rgb(24 32 34 / 66%);
   display: flex;
   flex-shrink: 0;
-  align-self: flex-start;
+  align-self: flex-end;
 }
 
-.list-of-tasks{
+.list-of-tasks {
   background: rgba(56 61 63 / 0%);
 }
 
@@ -48,7 +53,7 @@ a {
   width: 100%;
 }
 
-.card-body{
+.card-body {
   padding: 0;
 }
 
@@ -58,17 +63,17 @@ a {
   align-items: center;
 }
 
-.tasks-list{
+.tasks-list {
   overflow-y: auto;
   max-height: 55vh;
 }
 
-.actions{
+.actions {
   display: flex;
   justify-content: space-between;
 }
 
-.buttons-container{
+.buttons-container {
   display: flex;
   justify-content: flex-end;
 }
@@ -88,7 +93,7 @@ a {
 
 .team-desc {
   border: none;
-  background-color: rgba(0,0,0,0) !important;
+  background-color: rgba(0, 0, 0, 0) !important;
 }
 
 .team-name {

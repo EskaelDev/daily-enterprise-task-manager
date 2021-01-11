@@ -135,12 +135,12 @@ export class WorkerTasksComponent implements OnInit {
     const task = this.clickedTask.value;
 
     this.currentTaskForm = this.fb.group({
-      title: [{value: (task.title ? task.title : ''), disabled: true}, Validators.required],
-      description: [{value: task.description ? task.description : '', disabled: true}],
-      user: [{value: task.userLogin ? task.userLogin : 'unassigned', disabled: true}],
-      taskDuration: [task.taskDuration ? task.taskDuration : ''],
-      taskStatus: [task.taskStatus],
-      teamName: [{value: task.teamName ? task.teamName : '', disabled: true}, Validators.required]
+      teamName: [{value: task.teamName, disabled: true}, Validators.required],
+      title: [{value: task.title, disabled: true}, Validators.required],
+      description: [{value: task.description , disabled: true}],
+      user: [{value: task.userLogin , disabled: true}],
+      taskDuration: [task.taskDuration],
+      taskStatus: [task.taskStatus]
     });
 
     this.tmpTags = [];

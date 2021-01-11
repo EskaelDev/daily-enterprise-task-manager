@@ -28,11 +28,6 @@ export default class TasksController {
     @UseBefore(AuthMiddleware)
     @Post()
     public async AddTask(@Res() res: Response, @Body({ required: true }) task: Task, @HeaderParam("Authorization") token: string) {
-        if (this.authService.NotAdmin(token) && this.authService.NotManager(token) && this.authService.NotWorker(token)) {
-        
-            throw new UnauthorizedError();
-        }
-
         let response: ApiResponse = await new Promise(async (result) => {
             let request = await this.taskService.Put(task);
 
@@ -178,10 +173,6 @@ export default class TasksController {
     @UseBefore(AuthMiddleware)
     @Delete('/:id')
     public async DeleteTask(@Param('id') id: string, @Res() res: Response, @HeaderParam("Authorization") token: string) {
-        if (this.authService.NotAdmin(token) && this.authService.NotManager(token)) {
-
-            throw new UnauthorizedError();
-        }
 
         let response: ApiResponse = await new Promise(async (result) => {
             let request = await this.taskService.Delete('id', id);
