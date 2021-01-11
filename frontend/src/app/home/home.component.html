@@ -1,1 +1,21 @@
-nanannana home works
+<div class="router-to-tasks">
+  <a href="/tasks" *ngIf="isWorker" style="margin-right: 10rem;color: transparent;">
+    <fa-icon role="button" class="fa-10x" [icon]="faTasks"></fa-icon>
+    <h2 class="router-to-tasks-h2">My tasks</h2>
+  </a>
+
+  <a href="/users" *ngIf="isAdmin" class="a-left">
+    <fa-icon role="button" class="fa-10x" [icon]="faEdit"></fa-icon>
+    <h2 class="router-to-tasks-h2">Users</h2>
+  </a>
+
+  <a href="/teams-admin" *ngIf="isAdmin">
+    <fa-icon role="button" class="fa-10x" [icon]="faUserCog"></fa-icon>
+    <h2 class="router-to-tasks-h2">Teams</h2>
+  </a>
+
+  <a href="/teams" *ngIf="isManager">
+    <fa-icon role="button" class="fa-10x" [icon]="faUserCog"></fa-icon>
+    <h2 class="router-to-tasks-h2">Teams</h2>
+  </a>
+</div>
