@@ -63,10 +63,10 @@ export default class TasksController {
 
     }
 
-    
+
     @UseBefore(AuthMiddleware)
     @Post('/remind')
-    public async Remind(@Res() res: Response, @Body({ required: false }) message: {message:string}, @HeaderParam("Authorization") token: string) {
+    public async Remind(@Res() res: Response, @Body({ required: false }) message: { message: string }, @HeaderParam("Authorization") token: string) {
         this.snsService.Send(message.message);
         return res.status(StatusCodes.OK);
     }
@@ -106,15 +106,17 @@ export default class TasksController {
             for (let index = 0; index < response.body.Items.length; index++) {
                 let desc = response.body.Items[index].description;
                 desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(filter.language));
-                if (desc.successful)
-                {
+                if (desc.successful) {
                     response.body.Items[index].description = desc.translation.TranslatedText;
                     response.body.Items[index].taskLanguage = filter.language;
                 }
 
                 if (response.body.Items[index].userLogin) {
-                    response.body.Items[index]['User'] = await this.taskService.GetUser(response.body.Items[index].userLogin);
-                    response.body.Items[index]['User'].password = '';
+                    let tempUser = await this.taskService.GetUser(response.body.Items[index].userLogin);
+                    if (tempUser) {
+                        response.body.Items[index]['User'] = tempUser;
+                        response.body.Items[index]['User'].password = '';
+                    }
                 }
             }
 
@@ -269,6 +271,6 @@ export default class TasksController {
         return response
     }
 
-    
+
 
 }

@@ -156,8 +156,10 @@ export default class TeamController {
                 response.body.Item['Members'] = [];
                 for (let memeber = 0; memeber < response.body.Item.members.length; memeber++) {
                     let user: User = await this.teamService.GetMember(response.body.Item.members[memeber]);
-                    user.password = '';
-                    response.body.Item['Members'].push(user)
+                    if (user) {
+                        user.password = '';
+                        response.body.Item['Members'].push(user)
+                    }
                 }
             }
             if (response.body.Item.manager) {
