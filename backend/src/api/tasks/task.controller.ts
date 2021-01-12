@@ -111,6 +111,12 @@ export default class TasksController {
                     response.body.Items[index].taskLanguage = filter.language;
                 }
 
+                let title = response.body.Items[index].title;
+                title = await this.taskService.Translate(title, 'en', this.translationService.EnumToCode(filter.language));
+                if (title.successful) {
+                    response.body.Items[index].title = title.translation.TranslatedText;
+                }
+
                 if (response.body.Items[index].userLogin) {
                     let tempUser = await this.taskService.GetUser(response.body.Items[index].userLogin);
                     if (tempUser) {
@@ -164,6 +170,10 @@ export default class TasksController {
             let desc = response.body.Item.description;
             desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(lang));
             response.body.Item.description = desc.translation.TranslatedText;
+
+            let title = response.body.Item.title;
+            title = await this.taskService.Translate(title, 'en', this.translationService.EnumToCode(lang));
+            response.body.Item.title = title.translation.TranslatedText;
             return res.status(StatusCodes.OK).send(response);
         }
 

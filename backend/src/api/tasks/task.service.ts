@@ -30,10 +30,16 @@ export default class TaskService extends FilterableDbService<Task> {
     public async Put(task: Task): Promise<AWS.Request<DynamoDB.DocumentClient.PutItemOutput, AWS.AWSError>> {
 
         if (task.taskLanguage != Language.ENG) {
-            let result = await this.Translate(task.description, this.translateService.EnumToCode(task.taskLanguage), "en");
-            if (result.successful) {
+            let desc = await this.Translate(task.description, this.translateService.EnumToCode(task.taskLanguage), "en");
+            if (desc.successful) {
                 task.taskLanguage = Language.ENG;
-                task.description = result.translation.TranslatedText;
+                task.description = desc.translation.TranslatedText;
+            }
+
+            let title = await this.Translate(task.title, this.translateService.EnumToCode(task.taskLanguage), "en");
+            if (title.successful) {
+                task.taskLanguage = Language.ENG;
+                task.title = title.translation.TranslatedText;
             }
         }
 
