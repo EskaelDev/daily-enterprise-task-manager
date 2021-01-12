@@ -31,15 +31,11 @@ export default class TaskService extends FilterableDbService<Task> {
 
         if (task.taskLanguage != Language.ENG) {
             let desc = await this.Translate(task.description, this.translateService.EnumToCode(task.taskLanguage), "en");
-            if (desc.successful) {
-                task.taskLanguage = Language.ENG;
-                task.description = desc.translation.TranslatedText;
-            }
-
             let title = await this.Translate(task.title, this.translateService.EnumToCode(task.taskLanguage), "en");
-            if (title.successful) {
-                task.taskLanguage = Language.ENG;
+            if (desc.successful && title.successful) {
+                task.description = desc.translation.TranslatedText;
                 task.title = title.translation.TranslatedText;
+                task.taskLanguage = Language.ENG;
             }
         }
 
