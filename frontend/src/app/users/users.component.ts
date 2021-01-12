@@ -73,6 +73,7 @@ export class UsersComponent implements OnInit {
   }
 
   addNewUser() {
+    this.newUser.userLanguage = Language.ENG;
     this.usersService.create(this.newUser);
     this.newUser = new User();
   }

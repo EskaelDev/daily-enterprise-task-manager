@@ -18,7 +18,7 @@ export class UserService {
         'Authorization': `Bearer ${currUserToken}`
       });
 
-      return this.http.post<any>(`${environment.apiUrl}/users/filter`, {field: "userRole", value: `${userRole}`}, {headers: headers});
+      return this.http.post<any>(`${environment.apiUrl}/users/filter`, {field: "userRole", value: userRole}, {headers: headers});
   }
 
   update(user: User, language: Language) {

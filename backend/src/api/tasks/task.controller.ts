@@ -123,6 +123,9 @@ export default class TasksController {
                         response.body.Items[index]['User'] = tempUser;
                         response.body.Items[index]['User'].password = '';
                     }
+                    else{
+                        response.body.Items[index].userLogin = undefined;
+                    }
                 }
             }
 

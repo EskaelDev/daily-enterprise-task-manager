@@ -159,10 +159,6 @@ export default class UsersController {
 
     @Post('/admin')
     public async AddAdmin(@Res() res: Response, @Body({ required: true }) user: User, @BodyParam('password', { required: true }) password: string, @HeaderParam("Authorization") token: string) {
-        if (this.authService.NotAdmin(token)) {
-
-            throw new UnauthorizedError();
-        }
 
         let response: ApiResponse = await new Promise(async (result) => {
             let request = await this.userService.Put(user);
