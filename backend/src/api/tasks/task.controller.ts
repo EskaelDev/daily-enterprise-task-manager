@@ -143,6 +143,7 @@ export default class TasksController {
     public async GetById(@Res() res: Response, @Param('taskId') taskId: string, @Param('taskId') lang: Language, @HeaderParam("Authorization") token: string) {
         let response: ApiResponse = await new Promise(async (result) => {
             let request = await this.taskService.GetByKey(taskId);
+            if(request)
             request
                 .on('error', res => {
                     let response: ApiResponse = {
@@ -166,9 +167,20 @@ export default class TasksController {
                     }
                     result(response)
                 });
+                else{
+                let response: ApiResponse = {
+                    successful: false,
+                    caller: {
+                        class: 'TasksController',
+                        method: 'GetById'
+                    },
+                    body: null
+                }
+                result(response)
+            }
         });
 
-        if (response.successful) {
+        if (response.successful && Object.keys(response.body).length > 0) {
             let user: User = this.authService.ExtractUserFromToken(jwt_decode(token));
             let desc = response.body.Item.description;
             desc = await this.taskService.Translate(desc, 'en', this.translationService.EnumToCode(lang));
@@ -180,7 +192,7 @@ export default class TasksController {
             return res.status(StatusCodes.OK).send(response);
         }
 
-        throw new BadRequestError(response.body);
+        return res.status(StatusCodes.NOT_FOUND);
 
     }
 
