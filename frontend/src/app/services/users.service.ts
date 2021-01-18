@@ -2,6 +2,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {environment} from 'src/environments/environment';
+import { Role } from '../models/role.enum';
 import {User} from '../models/user';
 import {AuthService} from './auth.service';
 
@@ -29,6 +30,7 @@ export class UsersService {
     this.http.get<any>(`${environment.apiUrl}/users/all`, {headers: headers}).subscribe(
       data => {
         this.dataStore.users = data.body;
+        this.dataStore.users = this.dataStore.users.filter(user => user.userRole != Role.Admin);
         this._users.next(Object.assign({}, this.dataStore).users);
       }, () => this._error.next("Cannot load users"));
   }
